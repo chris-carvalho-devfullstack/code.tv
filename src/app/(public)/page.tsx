@@ -37,7 +37,7 @@ export default function HomePage() {
   return (
     <div className="flex flex-col min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-blue-200">
       
-      {/* Hero Section */}
+      {/* Hero Section - O Visual Ambilight Original Restaurado */}
       <section className="relative pt-24 pb-20 md:pt-32 md:pb-28 px-4 sm:px-6 lg:px-8 border-b border-slate-200 overflow-hidden bg-white/50 backdrop-blur-3xl">
         <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
           <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-500/20 blur-[120px]"></div>
@@ -55,7 +55,7 @@ export default function HomePage() {
           
           <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold tracking-tight mb-6 text-slate-900">
             Sua diversão garantida com <br className="hidden sm:block" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500">
+            <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-600 via-blue-500 to-cyan-500">
               UniTV
             </span>
           </h1>
@@ -88,14 +88,14 @@ export default function HomePage() {
             {planos.map((plano) => (
               <div 
                 key={plano.id} 
-                className={`p-6 sm:p-8 rounded-[2rem] flex flex-col transition-all duration-300 relative bg-white
+                className={`p-6 sm:p-8 rounded-4xl flex flex-col transition-all duration-300 relative bg-white
                   ${plano.highlight 
                     ? 'border-2 border-blue-600 shadow-2xl shadow-blue-900/10 md:-translate-y-4 z-10' 
                     : 'border border-slate-200 shadow-sm hover:border-blue-300 hover:shadow-md'
                   }`}
               >
                 {plano.highlight && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider shadow-md">
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-linear-to-r from-blue-600 to-cyan-500 text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider shadow-md">
                     Mais Escolhido
                   </div>
                 )}
@@ -108,7 +108,7 @@ export default function HomePage() {
                   {plano.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </div>
                 
-                <ul className="space-y-4 mb-10 flex-grow text-slate-600">
+                <ul className="space-y-4 mb-10 grow text-slate-600">
                   <li className="flex items-center gap-3">
                     <CheckCircle2 size={20} className="text-blue-500 shrink-0" /> 
                     <span>Envio imediato via E-mail</span>
@@ -139,7 +139,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Diferenciais Section - Dark */}
+      {/* Diferenciais Section */}
       <section className="pt-20 pb-16 md:pt-24 md:pb-20 px-4 sm:px-6 lg:px-8 bg-slate-900 text-white relative overflow-hidden">
         <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 rounded-full bg-blue-600/15 blur-[100px] pointer-events-none"></div>
         <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-96 h-96 rounded-full bg-cyan-600/15 blur-[120px] pointer-events-none"></div>
@@ -175,7 +175,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* SEO Section 1: Passo a Passo (Fundo Branco) */}
+      {/* SEO Section 1: Passo a Passo */}
       <section className="py-20 md:py-24 px-4 sm:px-6 lg:px-8 bg-white border-b border-slate-100">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
@@ -188,7 +188,6 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-            {/* Linha conectora no desktop */}
             <div className="hidden md:block absolute top-12 left-1/6 right-1/6 h-0.5 bg-slate-100 z-0"></div>
 
             <div className="flex flex-col items-center text-center relative z-10">
@@ -224,7 +223,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* SEO Section 2: Dispositivos Compatíveis (Fundo Slate-50) */}
+      {/* SEO Section 2: Dispositivos Compatíveis */}
       <section className="py-20 md:py-24 px-4 sm:px-6 lg:px-8 bg-slate-50 border-b border-slate-200">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-12">
           <div className="md:w-1/2">
@@ -252,8 +251,7 @@ export default function HomePage() {
             </ul>
           </div>
           <div className="md:w-1/2 w-full flex justify-center">
-            {/* Elemento visual decorativo para representar telas/devices */}
-            <div className="relative w-full max-w-md aspect-square bg-gradient-to-tr from-blue-100 to-cyan-50 rounded-full flex items-center justify-center p-8">
+            <div className="relative w-full max-w-md aspect-square bg-linear-to-tr from-blue-100 to-cyan-50 rounded-full flex items-center justify-center p-8">
               <div className="absolute inset-0 bg-blue-500/10 rounded-full blur-3xl"></div>
               <div className="relative bg-white rounded-2xl shadow-2xl p-6 w-full border border-slate-100 rotate-[-2deg] z-10">
                 <div className="flex items-center gap-3 mb-4">
@@ -272,7 +270,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* SEO Section 3: FAQ (Fundo Branco) */}
+      {/* SEO Section 3: FAQ */}
       <section className="py-20 md:py-24 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
@@ -285,7 +283,6 @@ export default function HomePage() {
           </div>
 
           <div className="space-y-4">
-            {/* Item FAQ 1 */}
             <details className="group bg-slate-50 p-6 rounded-2xl border border-slate-200 cursor-pointer [&_summary::-webkit-details-marker]:hidden">
               <summary className="flex items-center justify-between font-bold text-slate-900 text-lg">
                 Como recebo minha chave de acesso UniTV?
@@ -296,7 +293,6 @@ export default function HomePage() {
               </p>
             </details>
 
-            {/* Item FAQ 2 */}
             <details className="group bg-slate-50 p-6 rounded-2xl border border-slate-200 cursor-pointer [&_summary::-webkit-details-marker]:hidden">
               <summary className="flex items-center justify-between font-bold text-slate-900 text-lg">
                 O código de ativação tem prazo de validade?
@@ -307,7 +303,6 @@ export default function HomePage() {
               </p>
             </details>
 
-            {/* Item FAQ 3 */}
             <details className="group bg-slate-50 p-6 rounded-2xl border border-slate-200 cursor-pointer [&_summary::-webkit-details-marker]:hidden">
               <summary className="flex items-center justify-between font-bold text-slate-900 text-lg">
                 Posso usar a licença em mais de uma tela ao mesmo tempo?
@@ -321,12 +316,12 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Footer Premium - Fundo Black */}
+      {/* Footer Premium */}
       <footer className="bg-black text-slate-400 pt-16 pb-8 px-4 sm:px-6 lg:px-8 border-t border-slate-800">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
             <div className="col-span-1 md:col-span-2">
-              <span className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-cyan-400 mb-4 inline-block">
+              <span className="text-2xl font-bold text-transparent bg-clip-text bg-linear-to-r from-blue-500 to-cyan-400 mb-4 inline-block">
                 UniTV Digital
               </span>
               <p className="text-sm text-slate-500 leading-relaxed max-w-sm mb-6">
@@ -362,7 +357,8 @@ export default function HomePage() {
                 <Info size={28} className="text-slate-400" />
               </div>
               <div className="text-xs md:text-sm leading-relaxed text-slate-400 text-justify sm:text-left">
-                <strong className="block text-slate-200 text-base font-semibold mb-3 flex items-center gap-2">
+                {/* Aqui está a correção do "block vs flex" que causava aviso no VS Code */}
+                <strong className="flex items-center gap-2 text-slate-200 text-base font-semibold mb-3">
                   <Info size={18} className="sm:hidden text-blue-500" /> 
                   Aviso Legal e Transparência
                 </strong>
@@ -371,7 +367,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-800 to-transparent mb-8"></div>
+          <div className="w-full h-px bg-linear-to-r from-transparent via-slate-800 to-transparent mb-8"></div>
 
           <div className="text-center text-xs text-slate-600 flex flex-col md:flex-row justify-between items-center gap-4">
             <p>© {new Date().getFullYear()} UniTV Digital. Todos os direitos reservados.</p>
