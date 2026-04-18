@@ -1,5 +1,6 @@
 "use client";
 
+
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -8,6 +9,8 @@ import {
   ArrowLeft, ShieldCheck, Clock, Smartphone 
 } from "lucide-react";
 import Link from "next/link";
+
+export const runtime = 'edge';
 
 // Criamos uma interface para substituir o "any" e tipar corretamente o pedido
 interface PedidoType {
