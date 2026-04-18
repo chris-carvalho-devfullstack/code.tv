@@ -1,9 +1,6 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { randomUUID } from "crypto"; // Ferramenta nativa do Node.js para gerar IDs
-
-
 
 interface CartItemPayload {
   id: string;
@@ -19,27 +16,45 @@ export async function processarPedido(
   try {
     const supabase = await createClient();
 
-    // 1. Extrair os dados do formulário
+    // 1. VALIDAÇÃO DE SEGURANÇA (CLOUDFLARE TURNSTILE)
+    const turnstileToken = formData.get("cf-turnstile-response") as string;
+    const secretKey = process.env.TURNSTILE_SECRET_KEY;
+
+    if (!turnstileToken) {
+      return { erro: "Por favor, complete a verificação de segurança." };
+    }
+
+    // Valida o token com a API da Cloudflare
+    const verificado = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: `secret=${secretKey}&response=${turnstileToken}`,
+    });
+
+    const resultadoVerificacao = await verificado.json();
+    if (!resultadoVerificacao.success) {
+      return { erro: "Falha na verificação de segurança. Tente novamente." };
+    }
+
+    // 2. EXTRAÇÃO DOS DADOS
     const nome = formData.get("nome") as string;
     const email = formData.get("email") as string;
     const whatsapp = formData.get("whatsapp") as string;
 
-    // Validação básica
     if (!nome || !email || !whatsapp || items.length === 0) {
-      return { erro: "Por favor, preencha todos os campos obrigatórios e adicione itens." };
+      return { erro: "Preencha todos os campos obrigatórios." };
     }
 
-    // 2. Verificar se o utilizador tem sessão iniciada
     const { data: { user } } = await supabase.auth.getUser();
 
-    // 3. GERAR O ID AQUI NO SERVIDOR (Evita o erro de leitura do RLS)
-    const novoOrderId = randomUUID();
+    // 3. GERAÇÃO DE ID (Web Crypto API compatível com Edge)
+    const novoOrderId = crypto.randomUUID();
 
-    // 4. Inserir o pedido na tabela orders (SEM usar o .select())
+    // 4. INSERÇÃO NO BANCO
     const { error: orderError } = await supabase
       .from("orders")
       .insert({
-        id: novoOrderId, // Passamos o ID gerado por nós
+        id: novoOrderId,
         user_id: user?.id || null, 
         customer_email: email,
         customer_whatsapp: whatsapp,
@@ -49,16 +64,13 @@ export async function processarPedido(
 
     if (orderError) {
       console.error("Erro Supabase:", orderError);
-      return { erro: "Ocorreu um erro ao guardar o pedido no banco. Verifique as permissões (RLS)." };
+      return { erro: "Ocorreu um erro ao salvar o pedido." };
     }
 
-    // SUCESSO - MODO TESTE 
-    console.log("✅ TESTE BEM SUCEDIDO! Pedido salvo com ID:", novoOrderId);
-    
     return { 
       sucesso: true, 
-      orderId: novoOrderId, // Retornamos o ID que nós mesmos criamos
-      mensagem: "Teste: Pedido registado no banco com sucesso!" 
+      orderId: novoOrderId,
+      mensagem: "Pedido registrado com sucesso!" 
     };
 
   } catch (error) {

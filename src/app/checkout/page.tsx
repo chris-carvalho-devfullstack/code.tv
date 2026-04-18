@@ -1,5 +1,9 @@
 "use client";
 
+// Configurações para a Cloudflare aceitar o POST da Server Action
+export const runtime = 'edge';
+export const dynamic = 'force-dynamic';
+
 import { processarPedido } from "./actions";
 import { useCartStore } from "@/store/useCartStore";
 import { Lock, ChevronRight, ShieldCheck, Mail, User, CreditCard, ArrowLeft, Phone } from "lucide-react";
@@ -166,7 +170,7 @@ export default function CheckoutPage() {
             </section>
 
             <div className="flex justify-center">
-              <Turnstile siteKey="SUA_SITE_KEY_DO_CLOUDFLARE" />
+              <Turnstile siteKey="0x4AAAAAAC_YPcOthUeQyb-C" />
             </div>
           </div>
 
