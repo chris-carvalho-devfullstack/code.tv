@@ -3,7 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { randomUUID } from "crypto"; // Ferramenta nativa do Node.js para gerar IDs
 
-export const runtime = 'edge';
+
 
 interface CartItemPayload {
   id: string;
