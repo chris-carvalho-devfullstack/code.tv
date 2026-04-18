@@ -1,6 +1,5 @@
 "use client";
 
-
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -192,7 +191,18 @@ export default function PagamentoPage() {
            <p className="text-[10px] font-bold text-amber-600 uppercase mb-2">Painel de Teste (Sandbox)</p>
            <button 
              onClick={async () => {
-                await supabase.from("orders").update({ status: 'paid' }).eq('id', id);
+                console.log("Tentando simular pagamento para o ID:", id);
+                const { error } = await supabase
+                  .from("orders")
+                  .update({ status: 'paid' })
+                  .eq('id', id);
+
+                if (error) {
+                  console.error("Erro na simulação:", error.message, error.details);
+                  alert("Erro ao simular: " + error.message);
+                } else {
+                  console.log("Comando enviado com sucesso! Aguardando Realtime...");
+                }
              }}
              className="text-xs bg-amber-600 text-white px-3 py-1.5 rounded-lg font-bold hover:bg-amber-700 cursor-pointer"
            >
