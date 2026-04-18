@@ -46,7 +46,7 @@ export default function HomePage() {
         </div>
         
         <div className="max-w-5xl mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 border border-slate-200 text-slate-700 text-sm font-semibold mb-8 shadow-sm backdrop-blur-md min-w-[280px] justify-center transition-all duration-500">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 border border-slate-200 text-slate-700 text-sm font-semibold mb-8 shadow-sm backdrop-blur-md min-w-[280px] justify-center transition-all duration-500 cursor-default">
             <span className="flex items-center gap-2 animate-in fade-in duration-700" key={badgeIndex}>
               {badgeItems[badgeIndex].icon}
               {badgeItems[badgeIndex].text}
@@ -66,7 +66,7 @@ export default function HomePage() {
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <button 
               onClick={scrollToPlanos}
-              className="w-full sm:w-auto bg-blue-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-xl shadow-blue-600/30 flex items-center justify-center gap-2 hover:-translate-y-0.5"
+              className="w-full sm:w-auto bg-blue-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-xl shadow-blue-600/30 flex items-center justify-center gap-2 hover:-translate-y-0.5 cursor-pointer border-none"
             >
               Ver Planos de Acesso
             </button>
@@ -125,7 +125,7 @@ export default function HomePage() {
 
                 <button 
                   onClick={() => addItem({ ...plano, quantity: 1 })}
-                  className={`w-full py-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2
+                  className={`w-full py-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2 cursor-pointer border-none
                     ${plano.highlight 
                       ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/30' 
                       : 'bg-slate-50 hover:bg-slate-100 text-slate-900 border border-slate-200'
@@ -196,7 +196,7 @@ export default function HomePage() {
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-3">1. Escolha o Plano</h3>
               <p className="text-slate-600">
-                Selecione entre nossas opções de códigos de ativação: mensal, trimestral ou anual, de acordo com a sua necessidade.
+                Seleccione entre nossas opções de códigos de ativação: mensal, trimestral ou anual, de acordo com a sua necessidade.
               </p>
             </div>
 
@@ -284,31 +284,31 @@ export default function HomePage() {
 
           <div className="space-y-4">
             <details className="group bg-slate-50 p-6 rounded-2xl border border-slate-200 cursor-pointer [&_summary::-webkit-details-marker]:hidden">
-              <summary className="flex items-center justify-between font-bold text-slate-900 text-lg">
+              <summary className="flex items-center justify-between font-bold text-slate-900 text-lg cursor-pointer">
                 Como recebo minha chave de acesso UniTV?
                 <ChevronDown className="transition duration-300 group-open:-rotate-180 text-blue-600" size={24} />
               </summary>
-              <p className="text-slate-600 mt-4 leading-relaxed">
+              <p className="text-slate-600 mt-4 leading-relaxed cursor-text">
                 Assim que o pagamento é aprovado, nosso sistema gera automaticamente um código oficial de 16 dígitos. Esta chave de recarga é enviada instantaneamente para o e-mail cadastrado na hora da compra e também fica disponível no seu painel de cliente.
               </p>
             </details>
 
             <details className="group bg-slate-50 p-6 rounded-2xl border border-slate-200 cursor-pointer [&_summary::-webkit-details-marker]:hidden">
-              <summary className="flex items-center justify-between font-bold text-slate-900 text-lg">
+              <summary className="flex items-center justify-between font-bold text-slate-900 text-lg cursor-pointer">
                 O código de ativação tem prazo de validade?
                 <ChevronDown className="transition duration-300 group-open:-rotate-180 text-blue-600" size={24} />
               </summary>
-              <p className="text-slate-600 mt-4 leading-relaxed">
+              <p className="text-slate-600 mt-4 leading-relaxed cursor-text">
                 A validade do seu plano (30, 90 ou 365 dias) só começa a contar a partir do momento em que você insere a chave e faz a ativação no aplicativo da UniTV. Você pode comprar hoje e ativar apenas no mês que vem, sem perder nenhum dia.
               </p>
             </details>
 
             <details className="group bg-slate-50 p-6 rounded-2xl border border-slate-200 cursor-pointer [&_summary::-webkit-details-marker]:hidden">
-              <summary className="flex items-center justify-between font-bold text-slate-900 text-lg">
+              <summary className="flex items-center justify-between font-bold text-slate-900 text-lg cursor-pointer">
                 Posso usar a licença em mais de uma tela ao mesmo tempo?
                 <ChevronDown className="transition duration-300 group-open:-rotate-180 text-blue-600" size={24} />
               </summary>
-              <p className="text-slate-600 mt-4 leading-relaxed">
+              <p className="text-slate-600 mt-4 leading-relaxed cursor-text">
                 Cada chave de recarga que fornecemos é válida para 1 (um) dispositivo ativo. Para utilizar o aplicativo em múltiplos dispositivos simultaneamente, será necessário adquirir chaves de ativação adicionais.
               </p>
             </details>
@@ -335,18 +335,18 @@ export default function HomePage() {
             <div>
               <h3 className="text-slate-200 font-semibold mb-5 text-sm uppercase tracking-wider">Institucional</h3>
               <ul className="space-y-3 text-sm">
-                <li><a href="#" className="hover:text-cyan-400 transition-colors">Políticas de Privacidade</a></li>
-                <li><a href="#" className="hover:text-cyan-400 transition-colors">Termos de Uso</a></li>
-                <li><a href="#" className="hover:text-cyan-400 transition-colors">Política de Reembolso</a></li>
+                <li><a href="#" className="hover:text-cyan-400 transition-colors cursor-pointer block">Políticas de Privacidade</a></li>
+                <li><a href="#" className="hover:text-cyan-400 transition-colors cursor-pointer block">Termos de Uso</a></li>
+                <li><a href="#" className="hover:text-cyan-400 transition-colors cursor-pointer block">Política de Reembolso</a></li>
               </ul>
             </div>
 
             <div>
               <h3 className="text-slate-200 font-semibold mb-5 text-sm uppercase tracking-wider">Suporte</h3>
               <ul className="space-y-3 text-sm">
-                <li><a href="#" className="hover:text-cyan-400 transition-colors">Como ativar minha chave?</a></li>
-                <li><a href="#" className="hover:text-cyan-400 transition-colors">Dúvidas Frequentes (FAQ)</a></li>
-                <li><a href="#" className="hover:text-cyan-400 transition-colors">Fale Conosco</a></li>
+                <li><a href="#" className="hover:text-cyan-400 transition-colors cursor-pointer block">Como ativar minha chave?</a></li>
+                <li><a href="#" className="hover:text-cyan-400 transition-colors cursor-pointer block">Dúvidas Frequentes (FAQ)</a></li>
+                <li><a href="#" className="hover:text-cyan-400 transition-colors cursor-pointer block">Fale Conosco</a></li>
               </ul>
             </div>
           </div>
@@ -356,8 +356,7 @@ export default function HomePage() {
               <div className="p-4 bg-slate-800/80 rounded-xl shrink-0 hidden sm:block border border-slate-700/50">
                 <Info size={28} className="text-slate-400" />
               </div>
-              <div className="text-xs md:text-sm leading-relaxed text-slate-400 text-justify sm:text-left">
-                {/* Aqui está a correção do "block vs flex" que causava aviso no VS Code */}
+              <div className="text-xs md:text-sm leading-relaxed text-slate-400 text-justify sm:text-left cursor-default">
                 <strong className="flex items-center gap-2 text-slate-200 text-base font-semibold mb-3">
                   <Info size={18} className="sm:hidden text-blue-500" /> 
                   Aviso Legal e Transparência
@@ -369,7 +368,7 @@ export default function HomePage() {
 
           <div className="w-full h-px bg-linear-to-r from-transparent via-slate-800 to-transparent mb-8"></div>
 
-          <div className="text-center text-xs text-slate-600 flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="text-center text-xs text-slate-600 flex flex-col md:flex-row justify-between items-center gap-4 cursor-default">
             <p>© {new Date().getFullYear()} UniTV Digital. Todos os direitos reservados.</p>
             <p>Protegido por reCAPTCHA e sujeito às Políticas do Google.</p>
           </div>

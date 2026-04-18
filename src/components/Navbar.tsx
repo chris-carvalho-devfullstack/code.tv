@@ -28,14 +28,14 @@ export default function Navbar() {
             Minha Conta
           </Link>
           
-          <Link href="/checkout" className="relative p-2 bg-slate-100 rounded-full hover:bg-blue-100 transition">
+          <button onClick={() => useCartStore.getState().toggleCart()} className="relative p-2 bg-slate-100 rounded-full hover:bg-blue-100 transition cursor-pointer border-none">
             <ShoppingCart size={20} className="text-slate-700" />
             {mounted && totalItems > 0 && (
               <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white">
                 {totalItems}
               </span>
             )}
-          </Link>
+          </button>
         </div>
       </div>
     </nav>
