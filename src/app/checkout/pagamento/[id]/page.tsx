@@ -11,7 +11,7 @@ import Link from "next/link";
 
 export const runtime = 'edge';
 
-// Criamos uma interface para substituir o "any" e tipar corretamente o pedido
+// Interface para tipar o pedido corretamente
 interface PedidoType {
   id: string;
   status: string;
@@ -27,7 +27,7 @@ export default function PagamentoPage() {
   const [pedido, setPedido] = useState<PedidoType | null>(null);
   const [copiado, setCopiado] = useState(false);
 
-  // 1. Buscar dados do pedido
+  // 1. Buscar dados iniciais do pedido
   useEffect(() => {
     async function fetchPedido() {
       const { data, error } = await supabase
@@ -48,24 +48,43 @@ export default function PagamentoPage() {
     if (id) fetchPedido();
   }, [id, supabase]);
 
-  // 2. Escutar mudanças em tempo real (Realtime)
+  // 2. Escutar mudanças em tempo real (MELHORADO)
   useEffect(() => {
+    console.log("Iniciando canal Realtime para o pedido:", id);
+
     const channel = supabase
       .channel(`pedido-${id}`)
       .on(
         'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'orders', filter: `id=eq.${id}` },
+        { 
+          event: 'UPDATE', 
+          schema: 'public', 
+          table: 'orders', 
+          filter: `id=eq.${id}` 
+        },
         (payload) => {
-          setPedido(payload.new as PedidoType);
+          console.log("Mudança detectada via Realtime!", payload);
+          // Atualiza o estado com o novo pedido vindo do banco
+          if (payload.new) {
+            setPedido(payload.new as PedidoType);
+          }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log("Status da conexão Realtime:", status);
+        if (status === 'CHANNEL_ERROR') {
+          console.error("Erro ao conectar no Realtime. Verifique as políticas de RLS e se o Realtime está ativo no painel.");
+        }
+      });
 
-    return () => { supabase.removeChannel(channel); };
+    return () => {
+      console.log("Fechando canal Realtime");
+      supabase.removeChannel(channel);
+    };
   }, [id, supabase]);
 
   const handleCopyPix = () => {
-    navigator.clipboard.writeText("00020101021226870014br.gov.bcb.pix..."); // Placeholder do Copia e Cola
+    navigator.clipboard.writeText("00020101021226870014br.gov.bcb.pix..."); 
     setCopiado(true);
     setTimeout(() => setCopiado(false), 2000);
   };
@@ -85,10 +104,8 @@ export default function PagamentoPage() {
     <div className="min-h-screen bg-slate-50 pb-20">
       <div className="max-w-2xl mx-auto px-6 pt-12">
         
-        {/* Card Principal */}
         <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
           
-          {/* Header do Status */}
           <div className={`p-8 text-center ${isPago ? 'bg-emerald-50' : 'bg-blue-50'}`}>
             {isPago ? (
               <div className="flex flex-col items-center animate-in zoom-in duration-500">
@@ -115,7 +132,6 @@ export default function PagamentoPage() {
           <div className="p-8">
             {!isPago ? (
               <div className="space-y-8">
-                {/* Simulador de QR Code */}
                 <div className="flex flex-col items-center">
                   <div className="w-48 h-48 bg-slate-100 rounded-2xl flex items-center justify-center border-2 border-dashed border-slate-200 relative group">
                     <QrCode size={80} className="text-slate-300 group-hover:text-blue-400 transition-colors" />
@@ -128,7 +144,6 @@ export default function PagamentoPage() {
                   </p>
                 </div>
 
-                {/* Botão Copia e Cola */}
                 <button 
                   onClick={handleCopyPix}
                   className="w-full flex items-center justify-between p-4 bg-slate-50 hover:bg-slate-100 rounded-2xl border border-slate-200 transition-all group cursor-pointer"
@@ -145,7 +160,6 @@ export default function PagamentoPage() {
                   </div>
                 </button>
 
-                {/* Info do Pedido */}
                 <div className="pt-6 border-t border-slate-100 flex justify-between items-center text-sm">
                   <div>
                     <p className="text-slate-400">Total a pagar</p>
@@ -173,7 +187,6 @@ export default function PagamentoPage() {
           </div>
         </div>
 
-        {/* Footer de Segurança */}
         <div className="mt-8 flex flex-col items-center gap-4">
           <div className="flex items-center gap-6 opacity-40">
             <ShieldCheck size={20} />
@@ -186,22 +199,22 @@ export default function PagamentoPage() {
           </Link>
         </div>
 
-        {/* --- SIMULADOR APENAS PARA TESTES --- */}
+        {/* --- SIMULADOR COM LOGS MELHORADOS --- */}
         <div className="mt-12 p-4 bg-amber-50 border border-amber-100 rounded-xl">
            <p className="text-[10px] font-bold text-amber-600 uppercase mb-2">Painel de Teste (Sandbox)</p>
            <button 
              onClick={async () => {
-                console.log("Tentando simular pagamento para o ID:", id);
+                console.log("Iniciando simulação de pagamento para ID:", id);
                 const { error } = await supabase
                   .from("orders")
                   .update({ status: 'paid' })
                   .eq('id', id);
 
                 if (error) {
-                  console.error("Erro na simulação:", error.message, error.details);
-                  alert("Erro ao simular: " + error.message);
+                  console.error("Erro ao simular pagamento:", error.message);
+                  alert("Erro: " + error.message);
                 } else {
-                  console.log("Comando enviado com sucesso! Aguardando Realtime...");
+                  console.log("Update enviado com sucesso! Aguardando o sinal do Realtime...");
                 }
              }}
              className="text-xs bg-amber-600 text-white px-3 py-1.5 rounded-lg font-bold hover:bg-amber-700 cursor-pointer"
