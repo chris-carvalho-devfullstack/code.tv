@@ -2,6 +2,8 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { Trash2, Plus } from "lucide-react";
 
+export const runtime = 'edge';
+
 export default async function GerenciarChaves() {
   const supabase = await createClient();
   const { data: chaves } = await supabase.from('chaves').select('*').order('created_at', { ascending: false });
