@@ -29,8 +29,10 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
+  // ROTA /minha-conta ADICIONADA À PROTEÇÃO AQUI
   const isProtectedRoute = request.nextUrl.pathname.startsWith('/dashboard') || 
-                         request.nextUrl.pathname.startsWith('/conta')
+                         request.nextUrl.pathname.startsWith('/conta') ||
+                         request.nextUrl.pathname.startsWith('/minha-conta')
 
   if (isProtectedRoute && !user) {
     const url = request.nextUrl.clone()

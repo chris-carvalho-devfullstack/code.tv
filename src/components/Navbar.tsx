@@ -1,18 +1,50 @@
 "use client";
 
 import Link from "next/link";
-import { ShoppingCart, Tv } from "lucide-react";
+import { ShoppingCart, Tv, User as UserIcon } from "lucide-react";
 import { useCartStore } from "@/store/useCartStore";
 import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client"; // Adicionado cliente Supabase
 
 export default function Navbar() {
   const items = useCartStore((state) => state.items);
   const [mounted, setMounted] = useState(false);
+  
+  // Novos estados para autenticação
+  const [userName, setUserName] = useState<string | null>(null);
+  const [isCheckingUser, setIsCheckingUser] = useState(true);
+  
+  const supabase = createClient();
 
-  // Evita erro de hidratação com o Zustand persist
   useEffect(() => {
     setMounted(true);
-  }, []);
+
+    // 1. Busca o utilizador atual ao carregar a página
+    async function getUser() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const full = user.user_metadata?.full_name || user.email?.split('@')[0] || "Cliente";
+        setUserName(full.trim().split(' ')[0]); // Pega apenas o primeiro nome
+      }
+      setIsCheckingUser(false);
+    }
+
+    getUser();
+
+    // 2. Fica "à escuta" de logins/logouts para atualizar o menu em tempo real
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user) {
+        const full = session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || "Cliente";
+        setUserName(full.trim().split(' ')[0]);
+      } else {
+        setUserName(null); // Remove o nome se fizer logout
+      }
+    });
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, [supabase.auth]);
 
   const totalItems = items.reduce((acc, item) => acc + item.quantity, 0);
 
@@ -24,9 +56,20 @@ export default function Navbar() {
         </Link>
 
         <div className="flex items-center gap-6">
-          <Link href="/login" className="text-sm font-medium text-slate-600 hover:text-blue-600">
-            Minha Conta
-          </Link>
+          
+          {/* LÓGICA DO MENU DO UTILIZADOR */}
+          {!isCheckingUser ? (
+            <Link 
+              href={userName ? "/minha-conta" : "/login"} 
+              className="text-sm font-bold text-slate-600 hover:text-blue-600 flex items-center gap-2 transition-colors cursor-pointer"
+            >
+              <UserIcon size={16} className={userName ? "text-blue-500" : "text-slate-400"} />
+              {userName ? `Olá, ${userName}` : "Logar ou Criar Conta"}
+            </Link>
+          ) : (
+            // Skeleton de carregamento para evitar que o texto pisque
+            <div className="h-5 w-32 bg-slate-100 rounded-md animate-pulse"></div>
+          )}
           
           <button onClick={() => useCartStore.getState().toggleCart()} className="relative p-2 bg-slate-100 rounded-full hover:bg-blue-100 transition cursor-pointer border-none">
             <ShoppingCart size={20} className="text-slate-700" />
