@@ -29,20 +29,41 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  // ROTA /minha-conta ADICIONADA À PROTEÇÃO AQUI
+  // Rotas protegidas normais
   const isProtectedRoute = request.nextUrl.pathname.startsWith('/dashboard') || 
                          request.nextUrl.pathname.startsWith('/conta') ||
                          request.nextUrl.pathname.startsWith('/minha-conta')
 
+  // Nova rota Admin
+  const isAdminRoute = request.nextUrl.pathname.startsWith('/admin')
+
+  // Redireciona usuários não logados das rotas protegidas normais
   if (isProtectedRoute && !user) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)
   }
 
+  // Lógica de proteção exclusiva do ADMIN
+  if (isAdminRoute) {
+    if (!user) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/login'
+      return NextResponse.redirect(url)
+    }
+    
+    // Verifica se a role no metadata é admin
+    if (user.user_metadata?.role !== 'admin') {
+      const url = request.nextUrl.clone()
+      url.pathname = '/minha-conta' // Redireciona se não for admin
+      return NextResponse.redirect(url)
+    }
+  }
+
+  // Impede que usuário logado acesse login/cadastro
   if (user && (request.nextUrl.pathname.startsWith('/login') || request.nextUrl.pathname.startsWith('/signup'))) {
     const url = request.nextUrl.clone()
-    url.pathname = '/dashboard'
+    url.pathname = '/minha-conta'
     return NextResponse.redirect(url)
   }
 

@@ -1,17 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { ShoppingCart, Tv, User as UserIcon } from "lucide-react";
+import { ShoppingCart, Tv, User as UserIcon, LayoutDashboard } from "lucide-react";
 import { useCartStore } from "@/store/useCartStore";
 import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client"; // Adicionado cliente Supabase
+import { createClient } from "@/lib/supabase/client";
 
 export default function Navbar() {
   const items = useCartStore((state) => state.items);
   const [mounted, setMounted] = useState(false);
   
-  // Novos estados para autenticação
+  // Estados para autenticação e permissões
   const [userName, setUserName] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false); // Novo estado para Admin
   const [isCheckingUser, setIsCheckingUser] = useState(true);
   
   const supabase = createClient();
@@ -19,25 +20,29 @@ export default function Navbar() {
   useEffect(() => {
     setMounted(true);
 
-    // 1. Busca o utilizador atual ao carregar a página
+    // 1. Busca o utilizador e a role ao carregar a página
     async function getUser() {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const full = user.user_metadata?.full_name || user.email?.split('@')[0] || "Cliente";
-        setUserName(full.trim().split(' ')[0]); // Pega apenas o primeiro nome
+        setUserName(full.trim().split(' ')[0]);
+        // Verifica se é admin
+        setIsAdmin(user.user_metadata?.role === 'admin');
       }
       setIsCheckingUser(false);
     }
 
     getUser();
 
-    // 2. Fica "à escuta" de logins/logouts para atualizar o menu em tempo real
+    // 2. Escuta mudanças para atualizar em tempo real (login/logout)
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       if (session?.user) {
         const full = session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || "Cliente";
         setUserName(full.trim().split(' ')[0]);
+        setIsAdmin(session.user.user_metadata?.role === 'admin');
       } else {
-        setUserName(null); // Remove o nome se fizer logout
+        setUserName(null);
+        setIsAdmin(false);
       }
     });
 
@@ -57,6 +62,17 @@ export default function Navbar() {
 
         <div className="flex items-center gap-6">
           
+          {/* BOTÃO DASHBOARD MASTER (Aparece apenas para Admin) */}
+          {isAdmin && (
+            <Link 
+              href="/admin" 
+              className="hidden md:flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-xl font-bold hover:bg-slate-800 transition-all text-xs border border-slate-700 shadow-sm"
+            >
+              <LayoutDashboard size={14} className="text-cyan-400" />
+              Dashboard Master
+            </Link>
+          )}
+
           {/* LÓGICA DO MENU DO UTILIZADOR */}
           {!isCheckingUser ? (
             <Link 
@@ -67,11 +83,13 @@ export default function Navbar() {
               {userName ? `Olá, ${userName}` : "Logar ou Criar Conta"}
             </Link>
           ) : (
-            // Skeleton de carregamento para evitar que o texto pisque
             <div className="h-5 w-32 bg-slate-100 rounded-md animate-pulse"></div>
           )}
           
-          <button onClick={() => useCartStore.getState().toggleCart()} className="relative p-2 bg-slate-100 rounded-full hover:bg-blue-100 transition cursor-pointer border-none">
+          <button 
+            onClick={() => useCartStore.getState().toggleCart()} 
+            className="relative p-2 bg-slate-100 rounded-full hover:bg-blue-100 transition cursor-pointer border-none"
+          >
             <ShoppingCart size={20} className="text-slate-700" />
             {mounted && totalItems > 0 && (
               <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white">
