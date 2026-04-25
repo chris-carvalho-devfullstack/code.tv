@@ -5,14 +5,22 @@ import { createClient as createSupabaseAdmin } from "@supabase/supabase-js";
 
 interface CartItemPayload {
   id: string;
-  price: number;
+  price: number; // Mantemos na interface para não quebrar o frontend, mas o servidor vai ignorar
   quantity: number;
 }
+
+// 🛡️ 1. TABELA DE PREÇOS NO SERVIDOR (A Fonte da Verdade)
+// O hacker não consegue alterar isto porque está protegido no backend
+const PRECOS_REAIS: Record<string, number> = {
+  'unitv-mensal': 25.00,
+  'unitv-trimestral': 70.00, // Ajuste para o preço correto que você cobra
+  'unitv-anual': 200.00,     // Ajuste para o preço correto que você cobra
+};
 
 export async function processarPedido(
   formData: FormData, 
   items: CartItemPayload[], 
-  totalAmount: number
+  totalAmountFrontEnd: number // Renomeado para lembrar que não devemos confiar nele
 ) {
   try {
     // Cliente padrão (lê os cookies do usuário atual para Auth e Insertions permitidas)
@@ -53,9 +61,11 @@ export async function processarPedido(
       return { erro: "Preencha todos os campos obrigatórios." };
     }
 
-    // 3. VALIDAÇÃO DE ESTOQUE (A BARREIRA ZERO TRUST)
-    // O servidor checa se há chaves suficientes para cada item solicitado antes de cobrar
+    // 🛡️ 3. A DUPLA VALIDAÇÃO (ESTOQUE + RECALCULO DE PREÇO)
+    let valorTotalCalculadoNoServidor = 0;
+
     for (const item of items) {
+      // A) Verifica o estoque com a chave mestra
       const { count, error: countError } = await supabaseAdmin
         .from('chaves')
         .select('*', { count: 'exact', head: true })
@@ -72,6 +82,15 @@ export async function processarPedido(
           erro: `Infelizmente não temos estoque suficiente para o plano selecionado. Por favor, ajuste seu carrinho.` 
         };
       }
+
+      // B) Recalcula o preço ignorando o que veio do navegador (Blindagem de Fraude)
+      const precoCorreto = PRECOS_REAIS[item.id];
+      
+      if (precoCorreto === undefined) {
+        return { erro: "Produto inválido ou não reconhecido pelo sistema." };
+      }
+
+      valorTotalCalculadoNoServidor += (precoCorreto * item.quantity);
     }
 
     const { data: { user } } = await supabase.auth.getUser();
@@ -79,7 +98,7 @@ export async function processarPedido(
     // 4. GERAÇÃO DE ID (Web Crypto API compatível com Edge)
     const novoOrderId = crypto.randomUUID();
 
-    // 5. INSERÇÃO NO BANCO
+    // 5. INSERÇÃO NO BANCO (Usando o valor blindado)
     const { error: orderError } = await supabase
       .from("orders")
       .insert({
@@ -87,7 +106,7 @@ export async function processarPedido(
         user_id: user?.id || null, 
         customer_email: email,
         customer_whatsapp: whatsapp,
-        total_amount: totalAmount,
+        total_amount: valorTotalCalculadoNoServidor, // <--- AQUI OCORRE A PROTEÇÃO 🔒
         status: "pending" 
       });
 
