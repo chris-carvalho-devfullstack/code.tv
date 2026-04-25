@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client"; 
+import { buscarDadosDoCliente } from "./actions"; // 🌟 Importamos a nossa Action Segura
 import { 
   User, Package, Key, ChevronRight, 
   Copy, CheckCircle2, ExternalLink,
@@ -34,9 +35,6 @@ interface ActivationKey {
   order_id: string;
   expires_at?: string;
 }
-
-export const runtime = 'edge';
-
 
 export default function MinhaContaPage() {
   const router = useRouter();
@@ -83,26 +81,18 @@ export default function MinhaContaPage() {
         setAvatarUrl(photo);
         setPreviewAvatar(photo);
 
-        const { data: ordersData } = await supabase
-          .from('orders')
-          .select('*')
-          .eq('customer_email', user.email)
-          .order('created_at', { ascending: false });
+        // 🛡️ MUDANÇA DE SEGURANÇA: Chama o servidor em vez de expor o Supabase no navegador
+        const respostaServidor = await buscarDadosDoCliente();
         
-        setOrders(ordersData || []);
-
-        // ✅ CORREÇÃO APLICADA: 'licenses' alterado para 'chaves'
-        const { data: keysData } = await supabase
-          .from('chaves') 
-          .select('*')
-          .eq('customer_email', user.email);
-          
-        setKeys(keysData || []);
+        if (respostaServidor.sucesso) {
+          setOrders(respostaServidor.orders || []);
+          setKeys(respostaServidor.keys || []);
+        }
       }
       setLoading(false);
     }
     loadData();
-  }, [supabase]);
+  }, [supabase.auth]);
 
   const handleMascaraTelefone = (e: React.ChangeEvent<HTMLInputElement>) => {
     let valor = e.target.value.replace(/\D/g, ''); 
@@ -134,8 +124,8 @@ export default function MinhaContaPage() {
         const filePath = `${userName}-${fileName}`;
 
         const { error: uploadError } = await supabase.storage
-          .from('avatars')
-          .upload(filePath, newAvatarFile);
+        .from('avatars')
+        .upload(filePath, newAvatarFile, { upsert: true });
 
         if (!uploadError) {
           const { data } = supabase.storage.from('avatars').getPublicUrl(filePath);

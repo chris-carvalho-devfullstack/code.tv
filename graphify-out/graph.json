@@ -63,7 +63,7 @@
       "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\app\\layout.tsx",
       "source_location": "L1",
       "id": "c_users_christian_documents_desenvolvimento_projetos_code_tv_code_tv_src_app_layout_tsx",
-      "community": 6,
+      "community": 7,
       "norm_label": "layout.tsx"
     },
     {
@@ -72,7 +72,7 @@
       "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\app\\layout.tsx",
       "source_location": "L15",
       "id": "layout_rootlayout",
-      "community": 6,
+      "community": 7,
       "norm_label": "rootlayout()"
     },
     {
@@ -81,7 +81,7 @@
       "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\app\\(public)\\page.tsx",
       "source_location": "L1",
       "id": "c_users_christian_documents_desenvolvimento_projetos_code_tv_code_tv_src_app_public_page_tsx",
-      "community": 7,
+      "community": 8,
       "norm_label": "page.tsx"
     },
     {
@@ -90,7 +90,7 @@
       "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\app\\(public)\\page.tsx",
       "source_location": "L28",
       "id": "page_loadestoque",
-      "community": 7,
+      "community": 8,
       "norm_label": "loadestoque()"
     },
     {
@@ -99,16 +99,16 @@
       "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\app\\admin\\layout.tsx",
       "source_location": "L1",
       "id": "c_users_christian_documents_desenvolvimento_projetos_code_tv_code_tv_src_app_admin_layout_tsx",
-      "community": 8,
+      "community": 1,
       "norm_label": "layout.tsx"
     },
     {
       "label": "AdminLayout()",
       "file_type": "code",
       "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\app\\admin\\layout.tsx",
-      "source_location": "L4",
+      "source_location": "L6",
       "id": "layout_adminlayout",
-      "community": 8,
+      "community": 1,
       "norm_label": "adminlayout()"
     },
     {
@@ -225,16 +225,16 @@
       "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\app\\checkout\\actions.ts",
       "source_location": "L1",
       "id": "c_users_christian_documents_desenvolvimento_projetos_code_tv_code_tv_src_app_checkout_actions_ts",
-      "community": 1,
+      "community": 5,
       "norm_label": "actions.ts"
     },
     {
       "label": "processarPedido()",
       "file_type": "code",
       "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\app\\checkout\\actions.ts",
-      "source_location": "L20",
+      "source_location": "L19",
       "id": "actions_processarpedido",
-      "community": 1,
+      "community": 5,
       "norm_label": "processarpedido()"
     },
     {
@@ -295,9 +295,9 @@
       "label": "handleMascaraTelefone()",
       "file_type": "code",
       "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\app\\minha-conta\\page.tsx",
-      "source_location": "L105",
+      "source_location": "L107",
       "id": "page_handlemascaratelefone",
-      "community": 2,
+      "community": 3,
       "norm_label": "handlemascaratelefone()"
     },
     {
@@ -315,7 +315,7 @@
       "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\app\\checkout\\pagamento\\[id]\\page.tsx",
       "source_location": "L1",
       "id": "c_users_christian_documents_desenvolvimento_projetos_code_tv_code_tv_src_app_checkout_pagamento_id_page_tsx",
-      "community": 3,
+      "community": 4,
       "norm_label": "page.tsx"
     },
     {
@@ -324,7 +324,7 @@
       "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\app\\checkout\\pagamento\\[id]\\page.tsx",
       "source_location": "L41",
       "id": "page_formattime",
-      "community": 3,
+      "community": 4,
       "norm_label": "formattime()"
     },
     {
@@ -333,7 +333,7 @@
       "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\app\\checkout\\pagamento\\[id]\\page.tsx",
       "source_location": "L48",
       "id": "page_fetchpedido",
-      "community": 3,
+      "community": 4,
       "norm_label": "fetchpedido()"
     },
     {
@@ -342,7 +342,7 @@
       "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\app\\checkout\\pagamento\\[id]\\page.tsx",
       "source_location": "L83",
       "id": "page_handlecopypix",
-      "community": 3,
+      "community": 4,
       "norm_label": "handlecopypix()"
     },
     {
@@ -351,7 +351,7 @@
       "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\app\\checkout\\pagamento\\[id]\\page.tsx",
       "source_location": "L230",
       "id": "page_async",
-      "community": 3,
+      "community": 4,
       "norm_label": "async()"
     },
     {
@@ -378,14 +378,14 @@
       "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\app\\minha-conta\\page.tsx",
       "source_location": "L1",
       "id": "c_users_christian_documents_desenvolvimento_projetos_code_tv_code_tv_src_app_minha_conta_page_tsx",
-      "community": 4,
+      "community": 3,
       "norm_label": "page.tsx"
     },
     {
       "label": "loadData()",
       "file_type": "code",
       "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\app\\minha-conta\\page.tsx",
-      "source_location": "L69",
+      "source_location": "L70",
       "id": "page_loaddata",
       "community": 1,
       "norm_label": "loaddata()"
@@ -394,36 +394,36 @@
       "label": "handlePhotoSelect()",
       "file_type": "code",
       "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\app\\minha-conta\\page.tsx",
-      "source_location": "L113",
+      "source_location": "L115",
       "id": "page_handlephotoselect",
-      "community": 4,
+      "community": 3,
       "norm_label": "handlephotoselect()"
     },
     {
       "label": "handleUpdateProfile()",
       "file_type": "code",
       "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\app\\minha-conta\\page.tsx",
-      "source_location": "L121",
+      "source_location": "L123",
       "id": "page_handleupdateprofile",
-      "community": 4,
+      "community": 3,
       "norm_label": "handleupdateprofile()"
     },
     {
       "label": "handleLogout()",
       "file_type": "code",
       "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\app\\minha-conta\\page.tsx",
-      "source_location": "L178",
+      "source_location": "L179",
       "id": "page_handlelogout",
-      "community": 4,
+      "community": 3,
       "norm_label": "handlelogout()"
     },
     {
       "label": "handleCopy()",
       "file_type": "code",
       "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\app\\minha-conta\\page.tsx",
-      "source_location": "L185",
+      "source_location": "L186",
       "id": "page_handlecopy",
-      "community": 4,
+      "community": 3,
       "norm_label": "handlecopy()"
     },
     {
@@ -432,7 +432,7 @@
       "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\components\\CartDrawer.tsx",
       "source_location": "L1",
       "id": "c_users_christian_documents_desenvolvimento_projetos_code_tv_code_tv_src_components_cartdrawer_tsx",
-      "community": 5,
+      "community": 6,
       "norm_label": "cartdrawer.tsx"
     },
     {
@@ -441,7 +441,7 @@
       "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\components\\CartDrawer.tsx",
       "source_location": "L27",
       "id": "cartdrawer_formatcurrency",
-      "community": 5,
+      "community": 6,
       "norm_label": "formatcurrency()"
     },
     {
@@ -450,7 +450,7 @@
       "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\components\\CartDrawer.tsx",
       "source_location": "L35",
       "id": "cartdrawer_handleincrement",
-      "community": 5,
+      "community": 6,
       "norm_label": "handleincrement()"
     },
     {
@@ -470,6 +470,42 @@
       "id": "navbar_getuser",
       "community": 1,
       "norm_label": "getuser()"
+    },
+    {
+      "label": "auth.ts",
+      "file_type": "code",
+      "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\lib\\auth.ts",
+      "source_location": "L1",
+      "id": "c_users_christian_documents_desenvolvimento_projetos_code_tv_code_tv_src_lib_auth_ts",
+      "community": 1,
+      "norm_label": "auth.ts"
+    },
+    {
+      "label": "getSessionUser()",
+      "file_type": "code",
+      "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\lib\\auth.ts",
+      "source_location": "L4",
+      "id": "auth_getsessionuser",
+      "community": 1,
+      "norm_label": "getsessionuser()"
+    },
+    {
+      "label": "estoque.ts",
+      "file_type": "code",
+      "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\lib\\estoque.ts",
+      "source_location": "L1",
+      "id": "c_users_christian_documents_desenvolvimento_projetos_code_tv_code_tv_src_lib_estoque_ts",
+      "community": 5,
+      "norm_label": "estoque.ts"
+    },
+    {
+      "label": "verificarEstoqueNoBanco()",
+      "file_type": "code",
+      "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\lib\\estoque.ts",
+      "source_location": "L4",
+      "id": "estoque_verificarestoquenobanco",
+      "community": 5,
+      "norm_label": "verificarestoquenobanco()"
     },
     {
       "label": "client.ts",
@@ -570,13 +606,25 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\app\\admin\\layout.tsx",
-      "source_location": "L4",
+      "source_location": "L6",
       "weight": 1.0,
       "_src": "c_users_christian_documents_desenvolvimento_projetos_code_tv_code_tv_src_app_admin_layout_tsx",
       "_tgt": "layout_adminlayout",
       "source": "c_users_christian_documents_desenvolvimento_projetos_code_tv_code_tv_src_app_admin_layout_tsx",
       "target": "layout_adminlayout",
       "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\app\\admin\\layout.tsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_src": "layout_adminlayout",
+      "_tgt": "auth_getsessionuser",
+      "source": "layout_adminlayout",
+      "target": "auth_getsessionuser"
     },
     {
       "relation": "contains",
@@ -765,8 +813,8 @@
       "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\app\\checkout\\actions.ts",
       "source_location": "L36",
       "weight": 1.0,
-      "_src": "actions_processarpedido",
-      "_tgt": "route_get",
+      "_src": "route_get",
+      "_tgt": "actions_processarpedido",
       "source": "route_get",
       "target": "actions_processarpedido"
     },
@@ -786,7 +834,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\app\\checkout\\actions.ts",
-      "source_location": "L20",
+      "source_location": "L19",
       "weight": 1.0,
       "_src": "c_users_christian_documents_desenvolvimento_projetos_code_tv_code_tv_src_app_checkout_actions_ts",
       "_tgt": "actions_processarpedido",
@@ -811,6 +859,18 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\app\\checkout\\actions.ts",
+      "source_location": "L61",
+      "weight": 1.0,
+      "_src": "actions_processarpedido",
+      "_tgt": "estoque_verificarestoquenobanco",
+      "source": "actions_processarpedido",
+      "target": "estoque_verificarestoquenobanco"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\app\\checkout\\actions.ts",
       "source_location": "L96",
       "weight": 1.0,
       "_src": "actions_processarpedido",
@@ -825,8 +885,8 @@
       "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\app\\checkout\\page.tsx",
       "source_location": "L120",
       "weight": 1.0,
-      "_src": "page_handlesubmit",
-      "_tgt": "actions_processarpedido",
+      "_src": "actions_processarpedido",
+      "_tgt": "page_handlesubmit",
       "source": "actions_processarpedido",
       "target": "page_handlesubmit"
     },
@@ -954,7 +1014,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\app\\minha-conta\\page.tsx",
-      "source_location": "L105",
+      "source_location": "L107",
       "weight": 1.0,
       "_src": "c_users_christian_documents_desenvolvimento_projetos_code_tv_code_tv_src_app_minha_conta_page_tsx",
       "_tgt": "page_handlemascaratelefone",
@@ -1026,7 +1086,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\app\\minha-conta\\page.tsx",
-      "source_location": "L69",
+      "source_location": "L70",
       "weight": 1.0,
       "_src": "c_users_christian_documents_desenvolvimento_projetos_code_tv_code_tv_src_app_minha_conta_page_tsx",
       "_tgt": "page_loaddata",
@@ -1038,7 +1098,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\app\\minha-conta\\page.tsx",
-      "source_location": "L113",
+      "source_location": "L115",
       "weight": 1.0,
       "_src": "c_users_christian_documents_desenvolvimento_projetos_code_tv_code_tv_src_app_minha_conta_page_tsx",
       "_tgt": "page_handlephotoselect",
@@ -1050,7 +1110,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\app\\minha-conta\\page.tsx",
-      "source_location": "L121",
+      "source_location": "L123",
       "weight": 1.0,
       "_src": "c_users_christian_documents_desenvolvimento_projetos_code_tv_code_tv_src_app_minha_conta_page_tsx",
       "_tgt": "page_handleupdateprofile",
@@ -1062,7 +1122,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\app\\minha-conta\\page.tsx",
-      "source_location": "L178",
+      "source_location": "L179",
       "weight": 1.0,
       "_src": "c_users_christian_documents_desenvolvimento_projetos_code_tv_code_tv_src_app_minha_conta_page_tsx",
       "_tgt": "page_handlelogout",
@@ -1074,7 +1134,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\app\\minha-conta\\page.tsx",
-      "source_location": "L185",
+      "source_location": "L186",
       "weight": 1.0,
       "_src": "c_users_christian_documents_desenvolvimento_projetos_code_tv_code_tv_src_app_minha_conta_page_tsx",
       "_tgt": "page_handlecopy",
@@ -1128,6 +1188,54 @@
       "_tgt": "navbar_getuser",
       "source": "c_users_christian_documents_desenvolvimento_projetos_code_tv_code_tv_src_components_navbar_tsx",
       "target": "navbar_getuser",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\lib\\auth.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_src": "auth_getsessionuser",
+      "_tgt": "navbar_getuser",
+      "source": "navbar_getuser",
+      "target": "auth_getsessionuser"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\lib\\auth.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_src": "c_users_christian_documents_desenvolvimento_projetos_code_tv_code_tv_src_lib_auth_ts",
+      "_tgt": "auth_getsessionuser",
+      "source": "c_users_christian_documents_desenvolvimento_projetos_code_tv_code_tv_src_lib_auth_ts",
+      "target": "auth_getsessionuser",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\lib\\auth.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_src": "auth_getsessionuser",
+      "_tgt": "server_createclient",
+      "source": "auth_getsessionuser",
+      "target": "server_createclient"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Users\\Christian\\Documents\\Desenvolvimento\\Projetos\\code-tv\\code-tv\\src\\lib\\estoque.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_src": "c_users_christian_documents_desenvolvimento_projetos_code_tv_code_tv_src_lib_estoque_ts",
+      "_tgt": "estoque_verificarestoquenobanco",
+      "source": "c_users_christian_documents_desenvolvimento_projetos_code_tv_code_tv_src_lib_estoque_ts",
+      "target": "estoque_verificarestoquenobanco",
       "confidence_score": 1.0
     },
     {
