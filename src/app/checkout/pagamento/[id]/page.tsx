@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { createClient } from "@/lib/supabase/client"; //
+import { createClient } from "@/lib/supabase/client";
 import { 
   CheckCircle2, Loader2, Copy, QrCode, 
   ArrowLeft, ShieldCheck, Clock, Smartphone,
@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-export const runtime = 'edge'; ///page.tsx]
+export const runtime = 'edge';
 
 interface PedidoType {
   id: string;
@@ -22,7 +22,8 @@ interface PedidoType {
 type UIState = 'loading' | 'awaiting' | 'processing' | 'success';
 
 export default function PagamentoPage() {
-  const { id } = useParams();
+  const params = useParams();
+  const id = params.id as string;
   const supabase = createClient();
   
   const [uiState, setUiState] = useState<UIState>('loading');
@@ -30,6 +31,7 @@ export default function PagamentoPage() {
   const [copiado, setCopiado] = useState(false);
   const [timeLeft, setTimeLeft] = useState(1800);
 
+  // Timer do QRCode
   useEffect(() => {
     if (uiState !== 'awaiting') return;
     const timer = setInterval(() => {
@@ -44,40 +46,74 @@ export default function PagamentoPage() {
     return `${m}:${s}`;
   };
 
+  // Monitoramento Híbrido: Realtime ou Polling
   useEffect(() => {
-    async function fetchPedido() {
-      const { data } = await supabase
-        .from("orders")
-        .select("*")
-        .eq("id", id)
-        .single();
+    if (!id) return;
 
-      if (data) {
-        setPedido(data as PedidoType);
-        setUiState(data.status === 'paid' ? 'success' : 'awaiting');
+    let intervalId: NodeJS.Timeout;
+    let channel: ReturnType<typeof supabase.channel>;
+
+    function atualizarTela(dadosPedido: PedidoType) {
+      setPedido(dadosPedido);
+      
+      if (dadosPedido.status === 'paid') {
+        if (intervalId) clearInterval(intervalId); // Para o relógio se for anônimo
+        
+        setUiState((currentState) => {
+          // Só inicia a animação de 'processing' se ainda não estiver no processo
+          if (currentState !== 'processing' && currentState !== 'success') {
+            setTimeout(() => setUiState('success'), 1500);
+            return 'processing';
+          }
+          return currentState;
+        });
+      } else {
+        // Se ainda não foi pago, sai do 'loading' para o 'awaiting'
+        setUiState((currentState) => currentState === 'loading' ? 'awaiting' : currentState);
       }
     }
 
-    if (id) fetchPedido();
+    async function iniciarMonitoramento() {
+      const { data: { session } } = await supabase.auth.getSession();
 
-    const channel = supabase
-      .channel(`pedido-${id}`)
-      .on(
-        'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'orders', filter: `id=eq.${id}` },
-        (payload) => {
-          if (payload.new && (payload.new as PedidoType).status === 'paid') {
-            setUiState('processing');
-            setTimeout(() => {
-              setPedido(payload.new as PedidoType);
-              setUiState('success');
-            }, 1500);
-          }
-        }
-      )
-      .subscribe();
+      // --- MODO 1: REALTIME (Usuários Logados) ---
+      if (session) {
+        console.log("Modo Híbrido: Usando Realtime WebSocket");
+        
+        const { data: inicial } = await supabase.from("orders").select("*").eq("id", id).single();
+        if (inicial) atualizarTela(inicial as PedidoType);
 
-    return () => { supabase.removeChannel(channel); };
+        channel = supabase
+          .channel(`pedido-${id}`)
+          .on(
+            'postgres_changes',
+            { event: 'UPDATE', schema: 'public', table: 'orders', filter: `id=eq.${id}` },
+            (payload) => atualizarTela(payload.new as PedidoType)
+          )
+          .subscribe();
+      } 
+      // --- MODO 2: POLLING SEGURO VIA RPC (Visitantes Anônimos) ---
+      else {
+        console.log("Modo Híbrido: Usando Polling via RPC");
+        
+        const checkPaymentStatus = async () => {
+          const { data, error } = await supabase.rpc('buscar_pedido_anonimo', { p_id: id }).single();
+          if (data) atualizarTela(data as PedidoType);
+          if (error) console.error("Erro no polling:", error);
+        };
+
+        checkPaymentStatus(); // Roda a primeira vez imediatamente
+        intervalId = setInterval(checkPaymentStatus, 3000); // Depois fica perguntando a cada 3 segundos
+      }
+    }
+
+    iniciarMonitoramento();
+
+    // Limpeza ao desmontar o componente (fechar a página)
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+      if (channel) supabase.removeChannel(channel);
+    };
   }, [id, supabase]);
 
   const handleCopyPix = () => {
@@ -225,14 +261,17 @@ export default function PagamentoPage() {
         {uiState === 'awaiting' && (
           <div className="mt-8 p-4 bg-blue-50/50 border border-blue-100 rounded-2xl">
              <div className="flex items-center justify-between">
-               <p className="text-[10px] font-black text-blue-600 uppercase tracking-wider">Modo Simulação</p>
+               <div className="flex flex-col">
+                 <p className="text-[10px] font-black text-blue-600 uppercase tracking-wider">Modo Simulação</p>
+                 <p className="text-[10px] text-blue-500">Apenas Admins logados podem usar este botão</p>
+               </div>
                <button 
                  onClick={async () => {
                     await supabase.from("orders").update({ status: 'paid' }).eq('id', id);
                  }}
                  className="text-[10px] bg-white text-blue-600 px-3 py-1.5 rounded-lg font-bold border border-blue-200 hover:bg-blue-600 hover:text-white transition-all cursor-pointer"
                >
-                 Confirmar Pagamento no Banco
+                 Confirmar Pagamento
                </button>
              </div>
           </div>

@@ -8,7 +8,7 @@ const ContentSecurityPolicy = `
   style-src 'self' 'unsafe-inline';
   img-src 'self' blob: data: https://*.supabase.co;
   font-src 'self' data:;
-  connect-src 'self' https://*.supabase.co https://challenges.cloudflare.com;
+  connect-src 'self' https://*.supabase.co wss://*.supabase.co https://challenges.cloudflare.com;
   frame-src 'self' https://challenges.cloudflare.com;
 `.replace(/\s{2,}/g, ' ').trim();
 
