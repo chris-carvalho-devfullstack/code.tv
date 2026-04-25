@@ -1,36 +1,28 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { createClient as createSupabaseAdmin } from "@supabase/supabase-js";
+import { verificarEstoqueNoBanco } from "@/lib/estoque"; // 🌟 Importamos o nosso novo utilitário!
 
 interface CartItemPayload {
   id: string;
-  price: number; // Mantemos na interface para não quebrar o frontend, mas o servidor vai ignorar
+  price: number; 
   quantity: number;
 }
 
 // 🛡️ 1. TABELA DE PREÇOS NO SERVIDOR (A Fonte da Verdade)
-// O hacker não consegue alterar isto porque está protegido no backend
 const PRECOS_REAIS: Record<string, number> = {
   'unitv-mensal': 25.00,
-  'unitv-trimestral': 70.00, // Ajuste para o preço correto que você cobra
-  'unitv-anual': 200.00,     // Ajuste para o preço correto que você cobra
+  'unitv-trimestral': 70.00, 
+  'unitv-anual': 200.00,     
 };
 
 export async function processarPedido(
   formData: FormData, 
   items: CartItemPayload[], 
-  totalAmountFrontEnd: number // Renomeado para lembrar que não devemos confiar nele
+  _totalAmountFrontEnd: number // 🌟 Underline avisa o TypeScript que é ignorado de propósito
 ) {
   try {
-    // Cliente padrão (lê os cookies do usuário atual para Auth e Insertions permitidas)
     const supabase = await createClient();
-
-    // Cliente Admin (pula o RLS para poder fazer a contagem de estoque segura)
-    const supabaseAdmin = createSupabaseAdmin(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
 
     // 1. VALIDAÇÃO DE SEGURANÇA (CLOUDFLARE TURNSTILE)
     const turnstileToken = formData.get("cf-turnstile-response") as string;
@@ -40,7 +32,6 @@ export async function processarPedido(
       return { erro: "Por favor, complete a verificação de segurança." };
     }
 
-    // Valida o token com a API da Cloudflare
     const verificado = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -65,25 +56,17 @@ export async function processarPedido(
     let valorTotalCalculadoNoServidor = 0;
 
     for (const item of items) {
-      // A) Verifica o estoque com a chave mestra
-      const { count, error: countError } = await supabaseAdmin
-        .from('chaves')
-        .select('*', { count: 'exact', head: true })
-        .eq('plano_id', item.id)
-        .eq('status', 'disponivel');
+      
+      // A) Verifica o estoque com o nosso utilitário limpo (1 linha de código!)
+      const estoqueDisponivel = await verificarEstoqueNoBanco(item.id);
 
-      if (countError) {
-        console.error("Erro ao checar estoque:", countError);
-        return { erro: "Erro ao validar disponibilidade do produto." };
-      }
-
-      if (!count || count < item.quantity) {
+      if (estoqueDisponivel < item.quantity) {
         return { 
           erro: `Infelizmente não temos estoque suficiente para o plano selecionado. Por favor, ajuste seu carrinho.` 
         };
       }
 
-      // B) Recalcula o preço ignorando o que veio do navegador (Blindagem de Fraude)
+      // B) Recalcula o preço blindado
       const precoCorreto = PRECOS_REAIS[item.id];
       
       if (precoCorreto === undefined) {
@@ -94,11 +77,9 @@ export async function processarPedido(
     }
 
     const { data: { user } } = await supabase.auth.getUser();
-
-    // 4. GERAÇÃO DE ID (Web Crypto API compatível com Edge)
     const novoOrderId = crypto.randomUUID();
 
-    // 5. INSERÇÃO NO BANCO (Usando o valor blindado)
+    // 4. INSERÇÃO NO BANCO (Usando o valor blindado)
     const { error: orderError } = await supabase
       .from("orders")
       .insert({
@@ -106,7 +87,7 @@ export async function processarPedido(
         user_id: user?.id || null, 
         customer_email: email,
         customer_whatsapp: whatsapp,
-        total_amount: valorTotalCalculadoNoServidor, // <--- AQUI OCORRE A PROTEÇÃO 🔒
+        total_amount: valorTotalCalculadoNoServidor, 
         status: "pending" 
       });
 

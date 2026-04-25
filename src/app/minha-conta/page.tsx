@@ -12,8 +12,6 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 
-export const runtime = 'edge';
-
 interface OrderItem {
   id: string;
   name: string;
@@ -36,6 +34,9 @@ interface ActivationKey {
   order_id: string;
   expires_at?: string;
 }
+
+export const runtime = 'edge';
+
 
 export default function MinhaContaPage() {
   const router = useRouter();
@@ -90,8 +91,9 @@ export default function MinhaContaPage() {
         
         setOrders(ordersData || []);
 
+        // ✅ CORREÇÃO APLICADA: 'licenses' alterado para 'chaves'
         const { data: keysData } = await supabase
-          .from('licenses') 
+          .from('chaves') 
           .select('*')
           .eq('customer_email', user.email);
           
@@ -167,7 +169,6 @@ export default function MinhaContaPage() {
       }
 
     } catch (error: unknown) {
-      // Corrigido o "Unexpected any" garantindo uma tipagem segura
       const err = error as Error;
       setUpdateMessage({ type: 'error', text: err.message || 'Erro ao atualizar o perfil.' });
     } finally {
@@ -204,7 +205,6 @@ export default function MinhaContaPage() {
           
           <div className="w-24 h-24 bg-linear-to-tr from-blue-600 to-indigo-600 rounded-3xl flex items-center justify-center shadow-2xl shadow-blue-200 mb-6 relative overflow-hidden">
             {avatarUrl ? (
-              // Substituído <img> pelo <Image /> do Next.js
               <Image 
                 src={avatarUrl} 
                 alt="Perfil" 
@@ -279,7 +279,6 @@ export default function MinhaContaPage() {
                 <div className="relative z-10">
                   <h3 className="text-xl font-black text-slate-900 mb-5">{key.product_name}</h3>
                   <div className="bg-slate-50 p-5 rounded-2xl border border-slate-100 flex items-center justify-between">
-                    {/* Corrigido tracking-[0.1em] para tracking-widest */}
                     <code className="text-sm font-mono font-black text-slate-700 tracking-widest">{key.key_code}</code>
                     <button onClick={() => handleCopy(key.key_code)} className={`p-3 rounded-xl transition-all cursor-pointer ${copiado === key.key_code ? 'bg-emerald-500 text-white' : 'bg-white text-slate-400 border border-slate-100'}`}>
                       {copiado === key.key_code ? <CheckCircle2 size={20} /> : <Copy size={20} />}
@@ -322,7 +321,6 @@ export default function MinhaContaPage() {
 
       {isSettingsOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-          {/* Corrigido rounded-[32px] para rounded-4xl */}
           <div className="bg-white rounded-4xl max-w-sm w-full p-8 shadow-2xl animate-in zoom-in-95 duration-200 relative max-h-[90vh] overflow-y-auto">
             
             <button onClick={() => {
@@ -356,7 +354,6 @@ export default function MinhaContaPage() {
                   className="relative w-24 h-24 rounded-3xl bg-slate-100 border-2 border-dashed border-slate-300 flex items-center justify-center cursor-pointer hover:border-blue-500 transition-colors group overflow-hidden"
                 >
                   {previewAvatar ? (
-                    // Substituído <img> pelo <Image /> do Next.js
                     <Image 
                       src={previewAvatar} 
                       alt="Preview" 

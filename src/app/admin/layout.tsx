@@ -1,7 +1,20 @@
+import { redirect } from "next/navigation";
+import { getSessionUser } from "@/lib/auth";
 import Link from "next/link";
 import { LayoutDashboard, KeyRound, Users, LogOut, Package } from "lucide-react";
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  // 🛡️ BARREIRA ZERO TRUST: Verifica se está logado e se é o e-mail do dono
+  const user = await getSessionUser();
+  
+  // ⚠️ IMPORTANTE: Coloque o seu e-mail de acesso aqui!
+  const adminEmail = "chriscarvalho2017@gmail.com"; 
+
+  if (!user || user.email !== adminEmail) {
+    // Se for um visitante não autorizado, expulsa de volta para a página inicial
+    redirect("/"); 
+  }
+
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-slate-50">
       

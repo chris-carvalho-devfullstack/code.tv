@@ -14,7 +14,6 @@ export async function middleware(request: NextRequest) {
         getAll() {
           return request.cookies.getAll()
         },
-        // O comentário abaixo desativa o erro do ESLint para a próxima linha
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         setAll(cookiesToSet: { name: string; value: string; options?: any }[]) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
@@ -29,22 +28,22 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Rotas protegidas normais
-  const isProtectedRoute = request.nextUrl.pathname.startsWith('/dashboard') || 
-                         request.nextUrl.pathname.startsWith('/conta') ||
-                         request.nextUrl.pathname.startsWith('/minha-conta')
+  const pathname = request.nextUrl.pathname;
 
-  // Nova rota Admin
-  const isAdminRoute = request.nextUrl.pathname.startsWith('/admin')
+  // 1. ROTAS PROTEGIDAS NORMAIS
+  const isProtectedRoute = pathname.startsWith('/dashboard') || 
+                           pathname.startsWith('/conta') ||
+                           pathname.startsWith('/minha-conta')
 
-  // Redireciona usuários não logados das rotas protegidas normais
   if (isProtectedRoute && !user) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)
   }
 
-  // Lógica de proteção exclusiva do ADMIN
+  // 2. ROTA ADMIN (BLINDAGEM ZERO TRUST)
+  const isAdminRoute = pathname.startsWith('/admin')
+
   if (isAdminRoute) {
     if (!user) {
       const url = request.nextUrl.clone()
@@ -52,16 +51,22 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(url)
     }
     
-    // Verifica se a role no metadata é admin
-    if (user.user_metadata?.role !== 'admin') {
+    // 🛡️ Segurança: Usamos o e-mail do dono em vez de user_metadata
+    // Substitua pelo seu e-mail real de administrador
+    const adminEmail = "chriscarvalho2017@gmail.com";
+
+    if (user.email !== adminEmail) {
       const url = request.nextUrl.clone()
-      url.pathname = '/minha-conta' // Redireciona se não for admin
+      url.pathname = '/minha-conta' // Redireciona usuários comuns abelhudos
       return NextResponse.redirect(url)
     }
   }
 
-  // Impede que usuário logado acesse login/cadastro
-  if (user && (request.nextUrl.pathname.startsWith('/login') || request.nextUrl.pathname.startsWith('/signup'))) {
+  // 3. BLOQUEIO DE PÁGINAS PÚBLICAS PARA LOGADOS
+  // Corrigido de /signup para /cadastro
+  const isAuthRoute = pathname.startsWith('/login') || pathname.startsWith('/cadastro')
+  
+  if (user && isAuthRoute) {
     const url = request.nextUrl.clone()
     url.pathname = '/minha-conta'
     return NextResponse.redirect(url)
