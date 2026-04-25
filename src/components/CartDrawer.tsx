@@ -1,14 +1,20 @@
 "use client";
 
 import { useCartStore } from "@/store/useCartStore";
-import { X, Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
+import { X, Trash2, Plus, Minus, ShoppingBag, Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { verificarEstoqueItem } from "@/app/actions/estoque";
+import toast from "react-hot-toast";
 
 export default function CartDrawer() {
-  const { items, isOpen, toggleCart, removeItem, addItem, decreaseQuantity, getTotal } = useCartStore();
+  // Adicionado o updateQuantity que criamos na Store
+  const { items, isOpen, toggleCart, removeItem, decreaseQuantity, updateQuantity, getTotal } = useCartStore();
   const [mounted, setMounted] = useState(false);
+  
+  // Estado para saber qual item está sendo validado no servidor
+  const [loadingItemId, setLoadingItemId] = useState<string | null>(null);
 
   // Evita problemas de hidratação (SSR vs Client)
   useEffect(() => {
@@ -23,6 +29,37 @@ export default function CartDrawer() {
       style: 'currency',
       currency: 'BRL',
     }).format(value);
+  };
+
+  // Lógica segura de incremento (Zero Trust)
+  const handleIncrement = async (item: any) => {
+    setLoadingItemId(item.id); // Trava o botão e mostra o spinner
+    
+    try {
+      // Consulta a Server Action no Supabase
+      const estoqueDisponivel = await verificarEstoqueItem(item.id);
+      
+      if (item.quantity < estoqueDisponivel) {
+        updateQuantity(item.id, item.quantity + 1);
+      } else {
+        toast.error(`Limite atingido! Temos apenas ${estoqueDisponivel} unidades em estoque.`, {
+          style: {
+            borderRadius: '10px',
+            background: '#fee2e2',
+            color: '#991b1b',
+            border: '1px solid #f87171'
+          },
+          iconTheme: {
+            primary: '#ef4444',
+            secondary: '#fee2e2',
+          },
+        });
+      }
+    } catch (error) {
+      toast.error("Erro ao verificar estoque. Tente novamente.");
+    } finally {
+      setLoadingItemId(null); // Libera o botão
+    }
   };
 
   return (
@@ -85,14 +122,30 @@ export default function CartDrawer() {
                   
                   <div className="flex items-center justify-between mt-2">
                     <div className="flex items-center gap-3 bg-slate-100 rounded-full px-2 py-1">
+                      {/* BOTÃO MENOS */}
                       <button onClick={() => decreaseQuantity(item.id)} className="text-slate-600 hover:text-slate-900 border-none cursor-pointer bg-transparent">
                         <Minus size={14} />
                       </button>
+                      
+                      {/* QUANTIDADE */}
                       <span className="text-sm font-medium w-4 text-center">{item.quantity}</span>
-                      <button onClick={() => addItem(item)} className="text-slate-600 hover:text-slate-900 border-none cursor-pointer bg-transparent">
-                        <Plus size={14} />
+                      
+                      {/* BOTÃO MAIS INTELIGENTE */}
+                      <button 
+                        onClick={() => handleIncrement(item)} 
+                        disabled={loadingItemId === item.id}
+                        className={`border-none cursor-pointer bg-transparent flex items-center justify-center ${
+                          loadingItemId === item.id ? 'text-blue-400 cursor-wait' : 'text-slate-600 hover:text-slate-900'
+                        }`}
+                      >
+                        {loadingItemId === item.id ? (
+                          <Loader2 size={14} className="animate-spin" />
+                        ) : (
+                          <Plus size={14} />
+                        )}
                       </button>
                     </div>
+                    
                     <button onClick={() => removeItem(item.id)} className="text-red-400 hover:text-red-600 p-1 border-none cursor-pointer bg-transparent">
                       <Trash2 size={16} />
                     </button>

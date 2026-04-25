@@ -7,15 +7,36 @@ import {
   Smartphone, ChevronDown, HelpCircle 
 } from "lucide-react";
 import { useCartStore } from "@/store/useCartStore";
+import { consultarEstoqueTotal } from "@/app/actions/estoque";
+import toast from "react-hot-toast"; // Importação do Toast Notification
 
 export default function HomePage() {
   const addItem = useCartStore((state) => state.addItem);
   
+  // Estados para controle inteligente de estoque
+  const [estoque, setEstoque] = useState<Record<string, number>>({});
+  const [loadingEstoque, setLoadingEstoque] = useState(true);
+
   const [badgeIndex, setBadgeIndex] = useState(0);
   const badgeItems = [
     { text: "Entretenimento sem interrupções", icon: <PlayCircle size={18} className="text-blue-600" /> },
     { text: "Envio instantâneo 24/7", icon: <Zap size={18} className="text-blue-600" /> }
   ];
+
+  // Busca o estoque seguro via Server Action ao carregar a página
+  useEffect(() => {
+    async function loadEstoque() {
+      try {
+        const dados = await consultarEstoqueTotal();
+        setEstoque(dados);
+      } catch (error) {
+        console.error("Erro ao carregar estoque:", error);
+      } finally {
+        setLoadingEstoque(false);
+      }
+    }
+    loadEstoque();
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -34,10 +55,40 @@ export default function HomePage() {
     document.getElementById('planos')?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // Função de adicionar ao carrinho usando Toast Notifications
+  const handleAddToCart = (plano: any) => {
+    const itemsInCart = useCartStore.getState().items.find(i => i.id === plano.id)?.quantity || 0;
+    const availableStock = estoque[plano.id] || 0;
+
+    if (itemsInCart < availableStock) {
+      addItem({ ...plano, quantity: 1 });
+      toast.success(`${plano.name} adicionado ao carrinho!`, {
+        style: {
+          borderRadius: '10px',
+          background: '#333',
+          color: '#fff',
+        },
+      });
+    } else {
+      toast.error(`Limite atingido! Temos apenas ${availableStock} chave(s) em estoque.`, {
+        style: {
+          borderRadius: '10px',
+          background: '#fee2e2',
+          color: '#991b1b',
+          border: '1px solid #f87171'
+        },
+        iconTheme: {
+          primary: '#ef4444',
+          secondary: '#fee2e2',
+        },
+      });
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-blue-200">
       
-      {/* Hero Section - O Visual Ambilight Original Restaurado */}
+      {/* Hero Section */}
       <section className="relative pt-24 pb-20 md:pt-32 md:pb-28 px-4 sm:px-6 lg:px-8 border-b border-slate-200 overflow-hidden bg-white/50 backdrop-blur-3xl">
         <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
           <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-500/20 blur-[120px]"></div>
@@ -123,16 +174,26 @@ export default function HomePage() {
                   </li>
                 </ul>
 
-                <button 
-                  onClick={() => addItem({ ...plano, quantity: 1 })}
-                  className={`w-full py-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2 cursor-pointer border-none
-                    ${plano.highlight 
-                      ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/30' 
-                      : 'bg-slate-50 hover:bg-slate-100 text-slate-900 border border-slate-200'
-                    }`}
-                >
-                  Adicionar ao Carrinho <ShoppingCart size={20} />
-                </button>
+                {loadingEstoque ? (
+                  <button disabled className="w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2 cursor-wait border-none bg-slate-100 text-slate-400 animate-pulse">
+                    Verificando estoque...
+                  </button>
+                ) : estoque[plano.id] > 0 ? (
+                  <button 
+                    onClick={() => handleAddToCart(plano)}
+                    className={`w-full py-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2 cursor-pointer border-none
+                      ${plano.highlight 
+                        ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/30' 
+                        : 'bg-slate-50 hover:bg-slate-100 text-slate-900 border border-slate-200'
+                      }`}
+                  >
+                    Adicionar ao Carrinho <ShoppingCart size={20} />
+                  </button>
+                ) : (
+                  <button disabled className="w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2 cursor-not-allowed border-none bg-slate-200 text-slate-500">
+                    Produto Esgotado
+                  </button>
+                )}
               </div>
             ))}
           </div>
