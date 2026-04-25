@@ -5,7 +5,7 @@ import { X, Trash2, Plus, Minus, ShoppingBag, Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { verificarEstoqueItem } from "@/app/actions/estoque";
+
 import toast from "react-hot-toast";
 
 export default function CartDrawer() {
@@ -31,13 +31,17 @@ export default function CartDrawer() {
     }).format(value);
   };
 
-  // Lógica segura de incremento (Zero Trust)
+  // Lógica segura de incremento (Zero Trust via API)
   const handleIncrement = async (item: any) => {
-    setLoadingItemId(item.id); // Trava o botão e mostra o spinner
+    setLoadingItemId(item.id); 
     
     try {
-      // Consulta a Server Action no Supabase
-      const estoqueDisponivel = await verificarEstoqueItem(item.id);
+      // Consulta a API passando o ID do plano
+      const response = await fetch(`/api/estoque?plano_id=${item.id}`);
+      if (!response.ok) throw new Error("Erro no servidor");
+      
+      const data = await response.json();
+      const estoqueDisponivel = data.count;
       
       if (item.quantity < estoqueDisponivel) {
         updateQuantity(item.id, item.quantity + 1);
@@ -58,7 +62,7 @@ export default function CartDrawer() {
     } catch (error) {
       toast.error("Erro ao verificar estoque. Tente novamente.");
     } finally {
-      setLoadingItemId(null); // Libera o botão
+      setLoadingItemId(null); 
     }
   };
 

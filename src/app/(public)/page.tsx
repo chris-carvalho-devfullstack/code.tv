@@ -7,7 +7,7 @@ import {
   Smartphone, ChevronDown, HelpCircle 
 } from "lucide-react";
 import { useCartStore } from "@/store/useCartStore";
-import { consultarEstoqueTotal } from "@/app/actions/estoque";
+
 import toast from "react-hot-toast"; // Importação do Toast Notification
 
 export default function HomePage() {
@@ -23,11 +23,14 @@ export default function HomePage() {
     { text: "Envio instantâneo 24/7", icon: <Zap size={18} className="text-blue-600" /> }
   ];
 
-  // Busca o estoque seguro via Server Action ao carregar a página
+  // Busca o estoque seguro via API Route ao carregar a página
   useEffect(() => {
     async function loadEstoque() {
       try {
-        const dados = await consultarEstoqueTotal();
+        const response = await fetch('/api/estoque');
+        if (!response.ok) throw new Error("Erro de comunicação com o servidor");
+        
+        const dados = await response.json();
         setEstoque(dados);
       } catch (error) {
         console.error("Erro ao carregar estoque:", error);
