@@ -53,7 +53,7 @@ export async function middleware(request: NextRequest) {
     
     // 🛡️ Segurança: Usamos o e-mail do dono em vez de user_metadata
     // Substitua pelo seu e-mail real de administrador
-    const adminEmail = "chriscarvalho2017@gmail.com";
+    const adminEmail = process.env.ADMIN_EMAIL;
 
     if (user.email !== adminEmail) {
       const url = request.nextUrl.clone()

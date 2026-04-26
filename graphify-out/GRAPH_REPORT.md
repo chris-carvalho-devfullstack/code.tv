@@ -1,12 +1,12 @@
 # Graph Report - C:\Users\Christian\Documents\Desenvolvimento\Projetos\code-tv\code-tv  (2026-04-25)
 
 ## Corpus Check
-- 25 files · ~17,765 words
+- 26 files · ~18,682 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 61 nodes · 59 edges · 17 communities detected
-- Extraction: 66% EXTRACTED · 34% INFERRED · 0% AMBIGUOUS · INFERRED: 20 edges (avg confidence: 0.8)
+- 63 nodes · 64 edges · 18 communities detected
+- Extraction: 64% EXTRACTED · 36% INFERRED · 0% AMBIGUOUS · INFERRED: 23 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -27,18 +27,19 @@
 - [[_COMMUNITY_Community 14|Community 14]]
 - [[_COMMUNITY_Community 15|Community 15]]
 - [[_COMMUNITY_Community 16|Community 16]]
+- [[_COMMUNITY_Community 17|Community 17]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `createClient()` - 8 edges
-2. `GET()` - 6 edges
-3. `processarPedido()` - 6 edges
-4. `getUser()` - 6 edges
+1. `createClient()` - 9 edges
+2. `getUser()` - 7 edges
+3. `GET()` - 6 edges
+4. `processarPedido()` - 6 edges
 5. `handleSubmit()` - 4 edges
-6. `getSessionUser()` - 4 edges
-7. `addChave()` - 3 edges
-8. `deleteChave()` - 3 edges
-9. `handleProduto()` - 3 edges
-10. `deleteProduto()` - 3 edges
+6. `buscarDadosDoCliente()` - 4 edges
+7. `getSessionUser()` - 4 edges
+8. `addChave()` - 3 edges
+9. `deleteChave()` - 3 edges
+10. `handleProduto()` - 3 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `middleware()` --calls--> `getUser()`  [INFERRED]
@@ -59,8 +60,8 @@ Cohesion: 0.24
 Nodes (7): addChave(), AdminDashboard(), deleteChave(), deleteProduto(), handleProduto(), GET(), createClient()
 
 ### Community 1 - "Community 1"
-Cohesion: 0.2
-Nodes (6): getSessionUser(), AdminLayout(), middleware(), getUser(), checkUserSession(), loadData()
+Cohesion: 0.29
+Nodes (5): buscarDadosDoCliente(), middleware(), getUser(), checkUserSession(), loadData()
 
 ### Community 2 - "Community 2"
 Cohesion: 0.47
@@ -71,19 +72,19 @@ Cohesion: 0.33
 Nodes (1): handleMascaraTelefone()
 
 ### Community 4 - "Community 4"
-Cohesion: 0.4
-Nodes (0): 
+Cohesion: 0.5
+Nodes (2): atualizarTela(), iniciarMonitoramento()
 
 ### Community 5 - "Community 5"
 Cohesion: 0.5
-Nodes (2): processarPedido(), verificarEstoqueNoBanco()
+Nodes (2): getSessionUser(), AdminLayout()
 
 ### Community 6 - "Community 6"
-Cohesion: 0.67
-Nodes (0): 
+Cohesion: 0.5
+Nodes (2): processarPedido(), verificarEstoqueNoBanco()
 
 ### Community 7 - "Community 7"
-Cohesion: 1.0
+Cohesion: 0.67
 Nodes (0): 
 
 ### Community 8 - "Community 8"
@@ -122,42 +123,46 @@ Nodes (0):
 Cohesion: 1.0
 Nodes (0): 
 
+### Community 17 - "Community 17"
+Cohesion: 1.0
+Nodes (0): 
+
 ## Knowledge Gaps
-- **Thin community `Community 7`** (2 nodes): `layout.tsx`, `RootLayout()`
+- **Thin community `Community 8`** (2 nodes): `layout.tsx`, `RootLayout()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 8`** (2 nodes): `page.tsx`, `loadEstoque()`
+- **Thin community `Community 9`** (2 nodes): `page.tsx`, `loadEstoque()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 9`** (2 nodes): `page.tsx`, `handleRegister()`
+- **Thin community `Community 10`** (2 nodes): `page.tsx`, `handleRegister()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 10`** (2 nodes): `page.tsx`, `handleLogin()`
+- **Thin community `Community 11`** (2 nodes): `page.tsx`, `handleLogin()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 11`** (2 nodes): `client.ts`, `createClient()`
+- **Thin community `Community 12`** (2 nodes): `client.ts`, `createClient()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 12`** (1 nodes): `eslint.config.mjs`
+- **Thin community `Community 13`** (1 nodes): `eslint.config.mjs`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 13`** (1 nodes): `next-env.d.ts`
+- **Thin community `Community 14`** (1 nodes): `next-env.d.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 14`** (1 nodes): `next.config.ts`
+- **Thin community `Community 15`** (1 nodes): `next.config.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 15`** (1 nodes): `postcss.config.mjs`
+- **Thin community `Community 16`** (1 nodes): `postcss.config.mjs`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 16`** (1 nodes): `useCartStore.ts`
+- **Thin community `Community 17`** (1 nodes): `useCartStore.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `processarPedido()` connect `Community 5` to `Community 0`, `Community 1`, `Community 2`?**
-  _High betweenness centrality (0.169) - this node is a cross-community bridge._
-- **Why does `getUser()` connect `Community 1` to `Community 5`?**
-  _High betweenness centrality (0.160) - this node is a cross-community bridge._
-- **Why does `createClient()` connect `Community 0` to `Community 1`, `Community 5`?**
-  _High betweenness centrality (0.130) - this node is a cross-community bridge._
-- **Are the 7 inferred relationships involving `createClient()` (e.g. with `AdminDashboard()` and `addChave()`) actually correct?**
-  _`createClient()` has 7 INFERRED edges - model-reasoned connections that need verification._
+- **Why does `createClient()` connect `Community 0` to `Community 1`, `Community 5`, `Community 6`?**
+  _High betweenness centrality (0.146) - this node is a cross-community bridge._
+- **Why does `processarPedido()` connect `Community 6` to `Community 0`, `Community 1`, `Community 2`?**
+  _High betweenness centrality (0.139) - this node is a cross-community bridge._
+- **Why does `getUser()` connect `Community 1` to `Community 5`, `Community 6`?**
+  _High betweenness centrality (0.132) - this node is a cross-community bridge._
+- **Are the 8 inferred relationships involving `createClient()` (e.g. with `AdminDashboard()` and `addChave()`) actually correct?**
+  _`createClient()` has 8 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 6 inferred relationships involving `getUser()` (e.g. with `middleware()` and `processarPedido()`) actually correct?**
+  _`getUser()` has 6 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 5 inferred relationships involving `GET()` (e.g. with `addChave()` and `deleteChave()`) actually correct?**
   _`GET()` has 5 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 5 inferred relationships involving `processarPedido()` (e.g. with `createClient()` and `GET()`) actually correct?**
   _`processarPedido()` has 5 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 5 inferred relationships involving `getUser()` (e.g. with `middleware()` and `processarPedido()`) actually correct?**
-  _`getUser()` has 5 INFERRED edges - model-reasoned connections that need verification._

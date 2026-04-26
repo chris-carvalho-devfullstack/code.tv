@@ -8,7 +8,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const user = await getSessionUser();
   
   // ⚠️ IMPORTANTE: Coloque o seu e-mail de acesso aqui!
-  const adminEmail = "chriscarvalho2017@gmail.com"; 
+  const adminEmail = process.env.ADMIN_EMAIL;
 
   if (!user || user.email !== adminEmail) {
     // Se for um visitante não autorizado, expulsa de volta para a página inicial
