@@ -49,41 +49,61 @@ export default function HomePage() {
   }, [badgeItems.length]);
 
   const planos = [
-    { id: "unitv-mensal", name: "Mensal UniTV", price: 25.00, duration: "30 dias" },
-    { id: "unitv-anual", name: "Anual UniTV", price: 149.90, duration: "365 dias", highlight: true },
-    { id: "unitv-trimestral", name: "Trimestral UniTV", price: 65.00, duration: "90 dias" },
+    { 
+      id: "unitv-mensal", 
+      produto_id: "9ea4f471-7ae5-4f20-a95f-1c6efd0222f4", // UUID que você copiou da tabela 'produtos'
+      name: "Mensal UniTV", 
+      price: 25.00, 
+      duration: "30 dias",
+      // URL gerada pelo upload no Storage (exemplo)
+      image: "https://zmfcmdxvspblrmghrtsy.supabase.co/storage/v1/object/public/produtos/capas/0.08933206671202742.png" 
+    },
+    { 
+      id: "unitv-anual", 
+      produto_id: "d02a56c0-ab2e-4ac7-b6b4-f1e65e013c0e", // UUID do plano anual
+      name: "Anual UniTV", 
+      price: 149.90, 
+      duration: "365 dias", 
+      highlight: true,
+      image: "https://zmfcmdxvspblrmghrtsy.supabase.co/storage/v1/object/public/produtos/capas/0.916595411848002.png"
+    },
+    { 
+      id: "unitv-trimestral", 
+      produto_id: "ID_DO_BANCO_AQUI", // UUID do plano trimestral
+      name: "Trimestral UniTV", 
+      price: 65.00, 
+      duration: "90 dias",
+      image: "https://seu-projeto.supabase.co/storage/v1/object/public/produtos/capas/imagem-trimestral.webp"
+    },
   ];
 
   const scrollToPlanos = () => {
     document.getElementById('planos')?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Função de adicionar ao carrinho usando Toast Notifications
   const handleAddToCart = (plano: any) => {
+    // 1. CORREÇÃO: Usa 'plano.id' (ex: "unitv-mensal") para verificar o estoque
     const itemsInCart = useCartStore.getState().items.find(i => i.id === plano.id)?.quantity || 0;
     const availableStock = estoque[plano.id] || 0;
 
     if (itemsInCart < availableStock) {
-      addItem({ ...plano, quantity: 1 });
+      // 2. Manda TUDO para o carrinho
+      addItem({ 
+        id: plano.id,               // O Carrinho usa isso para checar o estoque ("unitv-mensal")
+        produto_id: plano.produto_id, // O UUID do banco que você colocou no array (Para rastrear a venda)
+        name: plano.name, 
+        price: plano.price, 
+        image: plano.image,         // A foto do produto
+        quantity: 1 
+      });
+      
       toast.success(`${plano.name} adicionado ao carrinho!`, {
-        style: {
-          borderRadius: '10px',
-          background: '#333',
-          color: '#fff',
-        },
+        style: { borderRadius: '10px', background: '#333', color: '#fff' }
       });
     } else {
       toast.error(`Limite atingido! Temos apenas ${availableStock} chave(s) em estoque.`, {
-        style: {
-          borderRadius: '10px',
-          background: '#fee2e2',
-          color: '#991b1b',
-          border: '1px solid #f87171'
-        },
-        iconTheme: {
-          primary: '#ef4444',
-          secondary: '#fee2e2',
-        },
+        style: { borderRadius: '10px', background: '#fee2e2', color: '#991b1b', border: '1px solid #f87171'},
+        iconTheme: { primary: '#ef4444', secondary: '#fee2e2' }
       });
     }
   };

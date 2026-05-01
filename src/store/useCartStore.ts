@@ -2,11 +2,12 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 export interface CartItem {
-  id: string;
+  id: string;         // Vai ser o plano_id (Ex: "unitv-mensal" -> usado para abater estoque)
+  produto_id: string; // NOVO: ID real do produto no banco (usado para rastrear a venda no Checkout)
   name: string;
   price: number;
   quantity: number;
-  image?: string; // Adicionado para exibir a foto no carrinho
+  image?: string;
 }
 
 interface CartStore {

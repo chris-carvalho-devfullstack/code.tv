@@ -5,7 +5,8 @@ import { verificarEstoqueNoBanco } from "@/lib/estoque";
 import { z } from "zod"; 
 
 interface CartItemPayload {
-  id: string;
+  id: string;         // plano_id (ex: unitv-mensal)
+  produto_id: string; // ID real da tabela 'produtos' (NOVO)
   price: number; 
   quantity: number;
 }
@@ -19,17 +20,16 @@ const PRECOS_REAIS: Record<string, number> = {
 // 🛡️ ESQUEMA DE VALIDAÇÃO ZOD ATUALIZADO
 const checkoutSchema = z.object({
   nome: z.string()
-    .trim() // Remove espaços em branco nas pontas
+    .trim() 
     .min(3, "O nome deve ter pelo menos 3 caracteres.")
     .max(100, "O nome é muito longo.")
     .refine((val) => val.split(/\s+/).length >= 2, {
-      // Exige pelo menos duas palavras (nome e sobrenome)
       message: "Por favor, insira o seu nome completo (nome e sobrenome).",
     }),
   
   email: z.string()
-    .trim() // Remove espaços acidentais
-    .toLowerCase() // Grava sempre em minúsculas no banco
+    .trim() 
+    .toLowerCase() 
     .email("Por favor, forneça um e-mail válido.")
     .regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, "Formato de e-mail inválido. Verifique o final (ex: .com, .com.br).")
     .max(150, "O e-mail é muito longo."),
@@ -48,7 +48,7 @@ export async function processarPedido(
   items: CartItemPayload[], 
   totalAmountFrontEnd: number 
 ) {
-  // CORREÇÃO 1: Consumimos a variável silenciosamente para o Linter parar de reclamar
+  // Consumimos a variável silenciosamente para o Linter parar de reclamar
   void totalAmountFrontEnd;
 
   try {
@@ -85,7 +85,6 @@ export async function processarPedido(
     const validatedFields = checkoutSchema.safeParse(rawData);
 
     if (!validatedFields.success) {
-      // CORREÇÃO 2: Usa .issues para ser imune à versão do Zod
       const errorMessage = validatedFields.error.issues[0].message;
       return { erro: errorMessage };
     }
@@ -94,8 +93,8 @@ export async function processarPedido(
 
     let valorTotalCalculadoNoServidor = 0;
 
+    // 1. Validação de Estoque e Cálculo de Preços
     for (const item of items) {
-      
       const estoqueDisponivel = await verificarEstoqueNoBanco(item.id);
 
       if (estoqueDisponivel < item.quantity) {
@@ -116,27 +115,63 @@ export async function processarPedido(
     const { data: { user } } = await supabase.auth.getUser();
     const novoOrderId = crypto.randomUUID();
 
+    // 2. Cria a "Capa" do Pedido na tabela orders
     const { error: orderError } = await supabase
       .from("orders")
       .insert({
         id: novoOrderId,
         user_id: user?.id || null, 
         customer_email: email,
-        customer_name: nome, // CORREÇÃO 3: Agora o nome está sendo usado e inserido no banco!
+        customer_name: nome, 
         customer_whatsapp: whatsapp,
         total_amount: valorTotalCalculadoNoServidor, 
         status: "pending" 
       });
 
     if (orderError) {
-      console.error("Erro Supabase:", orderError);
-      return { erro: "Ocorreu um erro ao salvar o pedido." };
+      console.error("Erro Supabase (Orders):", orderError);
+      return { erro: "Ocorreu um erro ao salvar o pedido principal." };
+    }
+
+    // 3. Insere os múltiplos produtos do carrinho na tabela order_items
+    const orderItemsData = items.map(item => ({
+      order_id: novoOrderId,
+      produto_id: item.produto_id,
+      quantidade: item.quantity,
+      preco_unitario: PRECOS_REAIS[item.id]
+    }));
+
+    const { error: itemsError } = await supabase
+      .from("order_items")
+      .insert(orderItemsData);
+
+    if (itemsError) {
+      console.error("Erro ao salvar itens do pedido:", itemsError);
+      // Opcional: Reverter o pedido se os itens falharem
+      await supabase.from("orders").update({ status: 'cancelled' }).eq('id', novoOrderId);
+      return { erro: "Erro ao registrar os produtos do pedido." };
+    }
+
+    // 4. AÇÃO CRÍTICA: Reservar as chaves via RPC (Lock por 5 minutos)
+    for (const item of items) {
+      const { data: reservaSucesso, error: rpcError } = await supabase
+        .rpc('reservar_chaves_seguro', {
+          p_plano_id: item.id,
+          p_quantidade: item.quantity,
+          p_order_id: novoOrderId
+        });
+
+      if (rpcError || !reservaSucesso) {
+        // Se a reserva falhar (ex: alguém comprou o último milissegundo antes), cancelamos o pedido
+        await supabase.from("orders").update({ status: 'cancelled' }).eq('id', novoOrderId);
+        return { erro: "Houve um conflito de estoque ao reservar as chaves. Por favor, tente novamente." };
+      }
     }
 
     return { 
       sucesso: true, 
       orderId: novoOrderId,
-      mensagem: "Pedido registrado com sucesso!" 
+      mensagem: "Pedido registrado com sucesso e chaves reservadas!" 
     };
 
   } catch (error) {
