@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation"; // <-- Adicionado useRouter
 import { createClient } from "@/lib/supabase/client";
+import { useCartStore } from "@/store/useCartStore"; // <-- Importado o seu Zustand
 import { 
   CheckCircle2, Loader2, Copy, QrCode, 
   ArrowLeft, ShieldCheck, Clock, Smartphone,
@@ -24,12 +25,17 @@ type UIState = 'loading' | 'awaiting' | 'processing' | 'success';
 export default function PagamentoPage() {
   const params = useParams();
   const id = params.id as string;
+  const router = useRouter(); // <-- Instanciado o router
+  const clearCart = useCartStore((state) => state.clearCart); // <-- Puxando a função de limpar carrinho
+  
   const supabase = createClient();
   
   const [uiState, setUiState] = useState<UIState>('loading');
   const [pedido, setPedido] = useState<PedidoType | null>(null);
   const [copiado, setCopiado] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(1800);
+  
+  // 1. ALTERADO: 600 segundos = Exatos 10 minutos
+  const [timeLeft, setTimeLeft] = useState(600);
 
   // Timer do QRCode
   useEffect(() => {
@@ -39,6 +45,15 @@ export default function PagamentoPage() {
     }, 1000);
     return () => clearInterval(timer);
   }, [uiState]);
+
+  // 2. NOVO: Monitora se o tempo acabou para limpar o carrinho
+  useEffect(() => {
+    if (timeLeft === 0 && uiState === 'awaiting') {
+      clearCart(); // Esvazia o Zustand instantaneamente
+      alert("O tempo para pagamento expirou (10 minutos). Seu carrinho foi cancelado.");
+      router.push("/"); // Redireciona para a home/loja
+    }
+  }, [timeLeft, uiState, clearCart, router]);
 
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60).toString().padStart(2, '0');

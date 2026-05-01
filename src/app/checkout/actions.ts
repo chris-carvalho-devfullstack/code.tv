@@ -1,7 +1,6 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { verificarEstoqueNoBanco } from "@/lib/estoque";
 import { z } from "zod"; 
 
 interface CartItemPayload {
@@ -93,16 +92,8 @@ export async function processarPedido(
 
     let valorTotalCalculadoNoServidor = 0;
 
-    // 1. Validação de Estoque e Cálculo de Preços
+    // 1. Cálculo de Preços Seguro no Servidor
     for (const item of items) {
-      const estoqueDisponivel = await verificarEstoqueNoBanco(item.id);
-
-      if (estoqueDisponivel < item.quantity) {
-        return { 
-          erro: `Infelizmente não temos estoque suficiente para o plano selecionado. Por favor, ajuste seu carrinho.` 
-        };
-      }
-
       const precoCorreto = PRECOS_REAIS[item.id];
       
       if (precoCorreto === undefined) {
@@ -147,27 +138,29 @@ export async function processarPedido(
 
     if (itemsError) {
       console.error("Erro ao salvar itens do pedido:", itemsError);
-      // Opcional: Reverter o pedido se os itens falharem
+      // Reverter o pedido se os itens falharem
       await supabase.from("orders").update({ status: 'cancelled' }).eq('id', novoOrderId);
       return { erro: "Erro ao registrar os produtos do pedido." };
     }
 
-    // 4. AÇÃO CRÍTICA: Reservar as chaves via RPC (Lock por 5 minutos)
+    // 4. AÇÃO CRÍTICA: Reservar as chaves via RPC (Lock por 15 minutos)
     for (const item of items) {
-      const { data: reservaSucesso, error: rpcError } = await supabase
+      const { error: rpcError } = await supabase
         .rpc('reservar_chaves_seguro', {
+          p_order_id: novoOrderId,
           p_plano_id: item.id,
           p_quantidade: item.quantity,
-          p_order_id: novoOrderId
+          p_tempo_minutos: 10
         });
 
-      if (rpcError || !reservaSucesso) {
-        // Se a reserva falhar (ex: alguém comprou o último milissegundo antes), cancelamos o pedido
+      if (rpcError) {
+        // Se a reserva falhar (falta de estoque cravada no banco), cancelamos o pedido
         await supabase.from("orders").update({ status: 'cancelled' }).eq('id', novoOrderId);
-        return { erro: "Houve um conflito de estoque ao reservar as chaves. Por favor, tente novamente." };
+        return { erro: `Houve um conflito de estoque para o plano selecionado. Por favor, tente novamente.` };
       }
     }
 
+    // 5. Sucesso absoluto! Tudo inserido e reservado.
     return { 
       sucesso: true, 
       orderId: novoOrderId,
