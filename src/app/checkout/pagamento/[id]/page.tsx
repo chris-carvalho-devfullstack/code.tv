@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation"; // <-- Adicionado useRouter
+import { useParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { useCartStore } from "@/store/useCartStore"; // <-- Importado o seu Zustand
+import { useCartStore } from "@/store/useCartStore";
+import { confirmarPagamentoAction } from "@/app/checkout/actions"; // 🌟 Import da nossa action segura
 import { 
   CheckCircle2, Loader2, Copy, QrCode, 
   ArrowLeft, ShieldCheck, Clock, Smartphone,
@@ -25,16 +26,16 @@ type UIState = 'loading' | 'awaiting' | 'processing' | 'success';
 export default function PagamentoPage() {
   const params = useParams();
   const id = params.id as string;
-  const router = useRouter(); // <-- Instanciado o router
-  const clearCart = useCartStore((state) => state.clearCart); // <-- Puxando a função de limpar carrinho
+  const router = useRouter(); 
+  const clearCart = useCartStore((state) => state.clearCart); 
   
   const supabase = createClient();
   
   const [uiState, setUiState] = useState<UIState>('loading');
   const [pedido, setPedido] = useState<PedidoType | null>(null);
   const [copiado, setCopiado] = useState(false);
+  const [isSimulating, setIsSimulating] = useState(false); // 🌟 Estado para feedback visual no botão de simular
   
-  // 1. ALTERADO: 600 segundos = Exatos 10 minutos
   const [timeLeft, setTimeLeft] = useState(600);
 
   // Timer do QRCode
@@ -46,12 +47,12 @@ export default function PagamentoPage() {
     return () => clearInterval(timer);
   }, [uiState]);
 
-  // 2. NOVO: Monitora se o tempo acabou para limpar o carrinho
+  // Monitora se o tempo acabou para limpar o carrinho
   useEffect(() => {
     if (timeLeft === 0 && uiState === 'awaiting') {
-      clearCart(); // Esvazia o Zustand instantaneamente
+      clearCart(); 
       alert("O tempo para pagamento expirou (10 minutos). Seu carrinho foi cancelado.");
-      router.push("/"); // Redireciona para a home/loja
+      router.push("/"); 
     }
   }, [timeLeft, uiState, clearCart, router]);
 
@@ -72,10 +73,9 @@ export default function PagamentoPage() {
       setPedido(dadosPedido);
       
       if (dadosPedido.status === 'paid') {
-        if (intervalId) clearInterval(intervalId); // Para o relógio se for anônimo
+        if (intervalId) clearInterval(intervalId); 
         
         setUiState((currentState) => {
-          // Só inicia a animação de 'processing' se ainda não estiver no processo
           if (currentState !== 'processing' && currentState !== 'success') {
             setTimeout(() => setUiState('success'), 1500);
             return 'processing';
@@ -83,7 +83,6 @@ export default function PagamentoPage() {
           return currentState;
         });
       } else {
-        // Se ainda não foi pago, sai do 'loading' para o 'awaiting'
         setUiState((currentState) => currentState === 'loading' ? 'awaiting' : currentState);
       }
     }
@@ -91,7 +90,6 @@ export default function PagamentoPage() {
     async function iniciarMonitoramento() {
       const { data: { session } } = await supabase.auth.getSession();
 
-      // --- MODO 1: REALTIME (Usuários Logados) ---
       if (session) {
         console.log("Modo Híbrido: Usando Realtime WebSocket");
         
@@ -107,7 +105,6 @@ export default function PagamentoPage() {
           )
           .subscribe();
       } 
-      // --- MODO 2: POLLING SEGURO VIA RPC (Visitantes Anônimos) ---
       else {
         console.log("Modo Híbrido: Usando Polling via RPC");
         
@@ -117,14 +114,13 @@ export default function PagamentoPage() {
           if (error) console.error("Erro no polling:", error);
         };
 
-        checkPaymentStatus(); // Roda a primeira vez imediatamente
-        intervalId = setInterval(checkPaymentStatus, 3000); // Depois fica perguntando a cada 3 segundos
+        checkPaymentStatus(); 
+        intervalId = setInterval(checkPaymentStatus, 3000); 
       }
     }
 
     iniciarMonitoramento();
 
-    // Limpeza ao desmontar o componente (fechar a página)
     return () => {
       if (intervalId) clearInterval(intervalId);
       if (channel) supabase.removeChannel(channel);
@@ -257,8 +253,8 @@ export default function PagamentoPage() {
                   <span className="font-bold text-slate-900 underline decoration-blue-500 underline-offset-4">{pedido?.customer_email}</span>
                 </p>
                 
-                <Link href="/" className="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-slate-800 transition-all shadow-xl shadow-slate-200 flex items-center justify-center gap-2">
-                  Voltar para a Loja
+                <Link href="/minha-conta" className="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-slate-800 transition-all shadow-xl shadow-slate-200 flex items-center justify-center gap-2">
+                  Acessar Minhas Chaves
                 </Link>
               </div>
             )}
@@ -281,11 +277,20 @@ export default function PagamentoPage() {
                  <p className="text-[10px] text-blue-500">Apenas Admins logados podem usar este botão</p>
                </div>
                <button 
+                 disabled={isSimulating}
                  onClick={async () => {
-                    await supabase.from("orders").update({ status: 'paid' }).eq('id', id);
+                    setIsSimulating(true);
+                    // 🌟 AQUI USAMOS A ACTION PARA TRANSIÇÃO SEGURA NO BANCO
+                    const res = await confirmarPagamentoAction(id);
+                    if (!res?.sucesso) {
+                      alert(res?.erro || "Erro ao simular pagamento");
+                      setIsSimulating(false);
+                    }
+                    // Se der sucesso, o realtime/polling cuida de atualizar a tela automaticamente.
                  }}
-                 className="text-[10px] bg-white text-blue-600 px-3 py-1.5 rounded-lg font-bold border border-blue-200 hover:bg-blue-600 hover:text-white transition-all cursor-pointer"
+                 className="text-[10px] bg-white text-blue-600 px-3 py-1.5 rounded-lg font-bold border border-blue-200 hover:bg-blue-600 hover:text-white transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                >
+                 {isSimulating ? <Loader2 size={12} className="animate-spin" /> : null}
                  Confirmar Pagamento
                </button>
              </div>

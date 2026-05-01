@@ -1,11 +1,12 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { revalidatePath } from "next/cache";
 import { z } from "zod"; 
 
 interface CartItemPayload {
   id: string;         // plano_id (ex: unitv-mensal)
-  produto_id: string; // ID real da tabela 'produtos' (NOVO)
+  produto_id: string; // ID real da tabela 'produtos'
   price: number; 
   quantity: number;
 }
@@ -42,12 +43,15 @@ const checkoutSchema = z.object({
     )
 });
 
+/**
+ * 1. FASE DE CHECKOUT (RESERVA)
+ * Cria o pedido pendente e reserva a chave por 10 minutos.
+ */
 export async function processarPedido(
   formData: FormData, 
   items: CartItemPayload[], 
   totalAmountFrontEnd: number 
 ) {
-  // Consumimos a variável silenciosamente para o Linter parar de reclamar
   void totalAmountFrontEnd;
 
   try {
@@ -92,7 +96,6 @@ export async function processarPedido(
 
     let valorTotalCalculadoNoServidor = 0;
 
-    // 1. Cálculo de Preços Seguro no Servidor
     for (const item of items) {
       const precoCorreto = PRECOS_REAIS[item.id];
       
@@ -106,7 +109,6 @@ export async function processarPedido(
     const { data: { user } } = await supabase.auth.getUser();
     const novoOrderId = crypto.randomUUID();
 
-    // 2. Cria a "Capa" do Pedido na tabela orders
     const { error: orderError } = await supabase
       .from("orders")
       .insert({
@@ -124,7 +126,6 @@ export async function processarPedido(
       return { erro: "Ocorreu um erro ao salvar o pedido principal." };
     }
 
-    // 3. Insere os múltiplos produtos do carrinho na tabela order_items
     const orderItemsData = items.map(item => ({
       order_id: novoOrderId,
       produto_id: item.produto_id,
@@ -138,12 +139,11 @@ export async function processarPedido(
 
     if (itemsError) {
       console.error("Erro ao salvar itens do pedido:", itemsError);
-      // Reverter o pedido se os itens falharem
       await supabase.from("orders").update({ status: 'cancelled' }).eq('id', novoOrderId);
       return { erro: "Erro ao registrar os produtos do pedido." };
     }
 
-    // 4. AÇÃO CRÍTICA: Reservar as chaves via RPC (Lock por 15 minutos)
+    // AÇÃO CRÍTICA: Reservar as chaves
     for (const item of items) {
       const { error: rpcError } = await supabase
         .rpc('reservar_chaves_seguro', {
@@ -154,13 +154,11 @@ export async function processarPedido(
         });
 
       if (rpcError) {
-        // Se a reserva falhar (falta de estoque cravada no banco), cancelamos o pedido
         await supabase.from("orders").update({ status: 'cancelled' }).eq('id', novoOrderId);
         return { erro: `Houve um conflito de estoque para o plano selecionado. Por favor, tente novamente.` };
       }
     }
 
-    // 5. Sucesso absoluto! Tudo inserido e reservado.
     return { 
       sucesso: true, 
       orderId: novoOrderId,
@@ -170,5 +168,42 @@ export async function processarPedido(
   } catch (error) {
     console.error("Erro interno:", error);
     return { erro: "Erro interno do servidor." };
+  }
+}
+
+/**
+ * 2. FASE DE PAGAMENTO (BLINDAGEM DA CHAVE)
+ * 🌟 NOVA AÇÃO: Transforma a chave de RESERVADA para VENDIDA.
+ */
+export async function confirmarPagamentoAction(orderId: string) {
+  try {
+    const supabase = await createClient();
+
+    // Chama a RPC que criamos para garantir as chaves (status = 'VENDIDA') 
+    // e atualizar o pedido para 'paid' em uma transação única
+    const { error: rpcError } = await supabase.rpc('confirmar_pagamento_chave', {
+      p_order_id: orderId
+    });
+
+    if (rpcError) {
+      console.error("[ERRO CRÍTICO] Falha ao transitar chave para VENDIDA:", rpcError);
+      return { 
+        sucesso: false, 
+        erro: "O pagamento foi reconhecido, mas houve um erro ao processar a chave. Contate o suporte." 
+      };
+    }
+
+    // Força a atualização do cache do Next.js
+    revalidatePath(`/checkout/pagamento/${orderId}`);
+    revalidatePath('/minha-conta');
+
+    return { 
+      sucesso: true,
+      mensagem: "Pagamento confirmado e chave garantida com sucesso!"
+    };
+
+  } catch (error) {
+    console.error("Erro interno ao confirmar pagamento:", error);
+    return { sucesso: false, erro: "Erro interno do servidor." };
   }
 }

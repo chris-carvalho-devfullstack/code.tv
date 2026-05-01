@@ -14,7 +14,7 @@ export default async function GerenciarChaves() {
     const plano = formData.get('plano') as string;
     const supabase = await createClient();
     
-    await supabase.from('chaves').insert([{ codigo, plano_id: plano, status: 'disponivel' }]);
+    await supabase.from('chaves').insert([{ codigo, plano_id: plano, status: 'DISPONIVEL' }]);
     revalidatePath('/admin/chaves');
   }
 
@@ -74,7 +74,7 @@ export default async function GerenciarChaves() {
                   <td className="p-4 text-slate-600 text-sm">{chave.plano_id}</td>
                   <td className="p-4">
                     <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                      chave.status === 'disponivel' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'
+                      chave.status === 'DISPONIVEL' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'
                     }`}>
                       {chave.status.toUpperCase()}
                     </span>

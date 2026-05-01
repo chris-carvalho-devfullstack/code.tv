@@ -3,11 +3,11 @@
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client"; 
-import { buscarDadosDoCliente } from "./actions"; // 🌟 Importamos a nossa Action Segura
+import { buscarDadosDoCliente } from "./actions";
+import BotaoRevelarChave from "@/components/BotaoRevelarChave"; // 🌟 Import do nosso novo componente
 import { 
   User, Package, Key, ChevronRight, 
-  Copy, CheckCircle2, ExternalLink,
-  LogOut, Settings, PlayCircle, Loader2, X, Save,
+  ExternalLink, LogOut, Settings, PlayCircle, Loader2, X, Save,
   Camera, Mail, Phone, AlertCircle
 } from "lucide-react";
 import Link from "next/link";
@@ -28,10 +28,13 @@ interface Order {
   items?: OrderItem[];
 }
 
+// 🛡️ Interface atualizada para espelhar as colunas reais do seu Supabase
 interface ActivationKey {
   id: string;
-  product_name: string;
-  key_code: string;
+  product_name?: string; 
+  plano_id: string;
+  codigo: string;
+  status: string;
   order_id: string;
   expires_at?: string;
 }
@@ -41,14 +44,12 @@ export default function MinhaContaPage() {
   const supabase = createClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  // Estados de Exibição Principal
   const [activeTab, setActiveTab] = useState<'pedidos' | 'chaves'>('pedidos');
   const [orders, setOrders] = useState<Order[]>([]);
   const [keys, setKeys] = useState<ActivationKey[]>([]);
   const [userName, setUserName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   
-  // Estados do Modal de Edição
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
@@ -56,11 +57,9 @@ export default function MinhaContaPage() {
   const [previewAvatar, setPreviewAvatar] = useState<string | null>(null);
   const [originalEmail, setOriginalEmail] = useState("");
   
-  // Estados de Controle
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
-  const [copiado, setCopiado] = useState<string | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [updateMessage, setUpdateMessage] = useState<{type: 'success' | 'error' | 'warning', text: string} | null>(null);
 
@@ -81,7 +80,6 @@ export default function MinhaContaPage() {
         setAvatarUrl(photo);
         setPreviewAvatar(photo);
 
-        // 🛡️ MUDANÇA DE SEGURANÇA: Chama o servidor em vez de expor o Supabase no navegador
         const respostaServidor = await buscarDadosDoCliente();
         
         if (respostaServidor.sucesso) {
@@ -173,12 +171,6 @@ export default function MinhaContaPage() {
     router.refresh(); 
   };
 
-  const handleCopy = (code: string) => {
-    navigator.clipboard.writeText(code);
-    setCopiado(code);
-    setTimeout(() => setCopiado(null), 2000);
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-white">
@@ -267,13 +259,17 @@ export default function MinhaContaPage() {
               <div key={key.id} className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm relative overflow-hidden group">
                 <PlayCircle className="absolute -right-4 -bottom-4 text-blue-50/50" size={120} />
                 <div className="relative z-10">
-                  <h3 className="text-xl font-black text-slate-900 mb-5">{key.product_name}</h3>
-                  <div className="bg-slate-50 p-5 rounded-2xl border border-slate-100 flex items-center justify-between">
-                    <code className="text-sm font-mono font-black text-slate-700 tracking-widest">{key.key_code}</code>
-                    <button onClick={() => handleCopy(key.key_code)} className={`p-3 rounded-xl transition-all cursor-pointer ${copiado === key.key_code ? 'bg-emerald-500 text-white' : 'bg-white text-slate-400 border border-slate-100'}`}>
-                      {copiado === key.key_code ? <CheckCircle2 size={20} /> : <Copy size={20} />}
-                    </button>
-                  </div>
+                  <h3 className="text-xl font-black text-slate-900 mb-5">
+                    {key.product_name || `Licença: ${key.plano_id}`}
+                  </h3>
+                  
+                  {/* 🌟 Aqui entra a mágica: O componente cuida de mostrar o botão ou a chave */}
+                  <BotaoRevelarChave 
+                    orderId={key.order_id} 
+                    planoId={key.plano_id} 
+                    chaveJaRevelada={key.status === 'REVELADA' ? key.codigo : undefined} 
+                  />
+                  
                 </div>
               </div>
             ))
