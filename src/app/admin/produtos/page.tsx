@@ -11,10 +11,11 @@ export default async function GerenciarProdutos() {
   
   const { data: produtos } = await supabase.from('produtos').select('*').order('nome');
 
+  // CORREÇÃO: status em MAIÚSCULO para bater com o banco de dados
   const { data: chavesDisponiveis } = await supabase
     .from('chaves')
     .select('plano_id')
-    .eq('status', 'disponivel');
+    .eq('status', 'DISPONIVEL');
 
   const estoque = {
     'unitv-mensal': 0,
